@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  path: one
+  user: one
+  current_milestone_id: 1
+  progress_percentage: 9.99
+
+two:
+  path: two
+  user: two
+  current_milestone_id: 1
+  progress_percentage: 9.99
