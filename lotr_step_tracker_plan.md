@@ -87,41 +87,41 @@ add_index :path_users, [:path_id, :user_id], unique: true
 # app/models/user.rb
 class User < ApplicationRecord
   has_secure_password
-  
+
   has_one :step, dependent: :destroy
   has_many :path_users, dependent: :destroy
   has_many :paths, through: :path_users
-  
+
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true
   validates :token_color, presence: true
-  
+
   after_create :create_associated_step
-  
+
   scope :non_admin, -> { where(admin: false) }
   scope :admin_users, -> { where(admin: true) }
-  
+
   def total_miles
     (step.total_steps * 0.0004735).round(2) # ~2,112 steps per mile average
   end
-  
+
   def current_position_on_path(path)
     path_users.find_by(path: path)
   end
-  
+
   private
-  
+
   def create_associated_step
     create_step(
       steps_until_mordor: calculate_initial_steps_to_mordor,
       steps_until_next_milestone: calculate_initial_steps_to_next_milestone
     )
   end
-  
+
   def calculate_initial_steps_to_mordor
     Path.active.first&.total_distance_miles_to_steps || 0
   end
-  
+
   def calculate_initial_steps_to_next_milestone
     Path.active.first&.milestones&.first&.distance_from_previous_miles_to_steps || 0
   end
@@ -133,56 +133,56 @@ end
 # app/models/step.rb
 class Step < ApplicationRecord
   belongs_to :user
-  
-  validates :total_steps, :steps_today, :steps_until_mordor, 
+
+  validates :total_steps, :steps_today, :steps_until_mordor,
             :steps_until_next_milestone, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  
+
   STEPS_PER_MILE = 2112
-  
+
   def can_update_today?
     last_updated_date != Date.current
   end
-  
+
   def total_miles
     (total_steps / STEPS_PER_MILE.to_f).round(2)
   end
-  
+
   def miles_today
     (steps_today / STEPS_PER_MILE.to_f).round(2)
   end
-  
+
   def miles_until_next_milestone
     (steps_until_next_milestone / STEPS_PER_MILE.to_f).round(2)
   end
-  
+
   def miles_until_mordor
     (steps_until_mordor / STEPS_PER_MILE.to_f).round(2)
   end
-  
+
   def add_steps(new_steps)
     return false unless can_update_today?
-    
+
     self.steps_today = new_steps
     self.total_steps += new_steps
     self.last_updated_date = Date.current
-    
+
     recalculate_distances
     save
   end
-  
+
   private
-  
+
   def recalculate_distances
     active_path = Path.active.first
     return unless active_path
-    
+
     path_user = user.current_position_on_path(active_path)
     current_milestone = path_user&.current_milestone
-    
+
     if current_milestone
       remaining_distance = active_path.remaining_distance_from_milestone(current_milestone, total_miles)
       self.steps_until_mordor = (remaining_distance * STEPS_PER_MILE).to_i
-      
+
       next_milestone = active_path.next_milestone_after(current_milestone)
       if next_milestone
         distance_to_next = next_milestone.cumulative_distance_miles - total_miles
@@ -200,30 +200,30 @@ class Path < ApplicationRecord
   has_many :milestones, -> { order(:sequence_order) }, dependent: :destroy
   has_many :path_users, dependent: :destroy
   has_many :users, through: :path_users
-  
+
   validates :name, :part_number, :total_distance_miles, presence: true
   validates :part_number, inclusion: { in: [1, 2] }
-  
+
   scope :active, -> { where(active: true) }
   scope :part_one, -> { where(part_number: 1) }
   scope :part_two, -> { where(part_number: 2) }
-  
+
   def total_distance_miles_to_steps
     total_distance_miles * Step::STEPS_PER_MILE
   end
-  
+
   def next_milestone_after(current_milestone)
     milestones.where('sequence_order > ?', current_milestone.sequence_order).first
   end
-  
+
   def remaining_distance_from_milestone(milestone, current_user_miles)
     total_distance_miles - current_user_miles
   end
-  
+
   def milestone_for_distance(miles)
     milestones.where('cumulative_distance_miles >= ?', miles).first
   end
-  
+
   def all_users_completed?
     path_users.all? { |pu| pu.progress_percentage >= 100.0 }
   end
@@ -235,12 +235,12 @@ end
 # app/models/milestone.rb
 class Milestone < ApplicationRecord
   belongs_to :path
-  
-  validates :name, :distance_from_previous_miles, :cumulative_distance_miles, 
+
+  validates :name, :distance_from_previous_miles, :cumulative_distance_miles,
             :sequence_order, presence: true
   validates :sequence_order, uniqueness: { scope: :path_id }
   validates :map_position_x, :map_position_y, presence: true
-  
+
   def distance_from_previous_miles_to_steps
     distance_from_previous_miles * Step::STEPS_PER_MILE
   end
@@ -254,9 +254,9 @@ class PathUser < ApplicationRecord
   belongs_to :path
   belongs_to :user
   belongs_to :current_milestone, class_name: 'Milestone', optional: true
-  
+
   validates :user_id, uniqueness: { scope: :path_id }
-  
+
   def update_progress
     user_miles = user.total_miles
     self.current_milestone = path.milestone_for_distance(user_miles)
@@ -275,11 +275,11 @@ end
 # app/controllers/sessions_controller.rb
 class SessionsController < ApplicationController
   skip_before_action :require_login, only: [:new, :create]
-  
+
   def new
     # Login modal
   end
-  
+
   def create
     user = User.find_by(email: params[:email])
     if user&.authenticate(params[:password])
@@ -290,7 +290,7 @@ class SessionsController < ApplicationController
       render :new, status: :unprocessable_entity
     end
   end
-  
+
   def destroy
     session[:user_id] = nil
     redirect_to login_path
@@ -303,37 +303,37 @@ end
 # app/controllers/steps_controller.rb
 class StepsController < ApplicationController
   before_action :require_login
-  
+
   def index
     @users = User.includes(:step, path_users: [:path, :current_milestone]).all
     @active_path = Path.active.includes(:milestones).first
     @current_user_step = current_user.step
   end
-  
+
   def update
     @step = current_user.step
-    
+
     unless @step.can_update_today?
-      return render json: { 
-        error: "Steps already updated today" 
+      return render json: {
+        error: "Steps already updated today"
       }, status: :unprocessable_entity
     end
-    
+
     steps_to_add = params[:steps].to_i
-    
+
     if steps_to_add <= 0
-      return render json: { 
-        error: "Steps must be greater than 0" 
+      return render json: {
+        error: "Steps must be greater than 0"
       }, status: :unprocessable_entity
     end
-    
+
     if @step.add_steps(steps_to_add)
       update_user_path_progress
-      
+
       respond_to do |format|
         format.html { redirect_to root_path, notice: "Steps updated successfully!" }
-        format.json { 
-          render json: { 
+        format.json {
+          render json: {
             success: true,
             step: step_json(@step),
             message: "Added #{steps_to_add} steps (#{@step.miles_today} miles)"
@@ -342,61 +342,61 @@ class StepsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { 
-          redirect_to root_path, 
-          alert: "Failed to update steps: #{@step.errors.full_messages.join(', ')}" 
+        format.html {
+          redirect_to root_path,
+          alert: "Failed to update steps: #{@step.errors.full_messages.join(', ')}"
         }
-        format.json { 
-          render json: { 
-            error: @step.errors.full_messages 
-          }, status: :unprocessable_entity 
+        format.json {
+          render json: {
+            error: @step.errors.full_messages
+          }, status: :unprocessable_entity
         }
       end
     end
   end
-  
+
   def admin_update
     unless current_user.admin?
       return render json: { error: "Unauthorized" }, status: :forbidden
     end
-    
+
     @step = Step.find(params[:id])
     steps_to_add = params[:steps].to_i
-    
+
     if @step.add_steps(steps_to_add)
       user = @step.user
       user.current_position_on_path(Path.active.first)&.update_progress
-      
-      render json: { 
+
+      render json: {
         success: true,
         step: step_json(@step)
       }
     else
-      render json: { 
-        error: @step.errors.full_messages 
+      render json: {
+        error: @step.errors.full_messages
       }, status: :unprocessable_entity
     end
   end
-  
+
   private
-  
+
   def update_user_path_progress
     active_path = Path.active.first
     path_user = current_user.current_position_on_path(active_path)
     path_user&.update_progress
-    
+
     check_path_completion(active_path)
   end
-  
+
   def check_path_completion(path)
     return unless path.all_users_completed?
-    
+
     if path.part_number == 1
       # Activate Part 2 and reset user positions
       PathTransitionService.new(path).transition_to_part_two
     end
   end
-  
+
   def step_json(step)
     {
       total_steps: step.total_steps,
@@ -416,7 +416,7 @@ end
 # app/controllers/dashboard_controller.rb
 class DashboardController < ApplicationController
   before_action :require_login
-  
+
   def index
     @users = User.includes(:step, path_users: [:current_milestone]).all
     @active_path = Path.active.includes(milestones: []).first
@@ -438,12 +438,12 @@ require 'googleauth'
 class GoogleSheetsService
   SPREADSHEET_ID = ENV['GOOGLE_SHEET_ID']
   RANGE = 'Sheet1!A2:B5' # Adjust based on your sheet structure
-  
+
   def initialize
     @service = Google::Apis::SheetsV4::SheetsService.new
     @service.authorization = authorize
   end
-  
+
   def fetch_user_steps
     response = @service.get_spreadsheet_values(SPREADSHEET_ID, RANGE)
     parse_response(response)
@@ -451,27 +451,27 @@ class GoogleSheetsService
     Rails.logger.error("Google Sheets API error: #{e.message}")
     {}
   end
-  
+
   private
-  
+
   def authorize
     Google::Auth::ServiceAccountCredentials.make_creds(
       json_key_io: StringIO.new(ENV['GOOGLE_SERVICE_ACCOUNT_JSON']),
       scope: Google::Apis::SheetsV4::AUTH_SPREADSHEETS_READONLY
     )
   end
-  
+
   def parse_response(response)
     # Expected format: Column A = email, Column B = steps for today
     steps_data = {}
-    
+
     response.values&.each do |row|
       email = row[0]&.strip&.downcase
       steps = row[1]&.to_i || 0
-      
+
       steps_data[email] = steps if email.present? && steps > 0
     end
-    
+
     steps_data
   end
 end
@@ -484,18 +484,18 @@ class PathTransitionService
   def initialize(current_path)
     @current_path = current_path
   end
-  
+
   def transition_to_part_two
     return unless @current_path.part_number == 1
-    
+
     ActiveRecord::Base.transaction do
       # Deactivate Part 1
       @current_path.update!(active: false)
-      
+
       # Activate Part 2
       part_two = Path.part_two.first
       part_two.update!(active: true)
-      
+
       # Reset all users to start of Part 2 (Shire)
       User.find_each do |user|
         # Maintain total_steps but reset position
@@ -505,7 +505,7 @@ class PathTransitionService
           current_milestone: part_two.milestones.first,
           progress_percentage: 0.0
         )
-        
+
         # Update step calculations for new path
         step = user.step
         step.update!(
@@ -514,7 +514,7 @@ class PathTransitionService
         )
       end
     end
-    
+
     Rails.logger.info("Transitioned all users from Part 1 to Part 2")
   end
 end
@@ -525,11 +525,11 @@ end
 # app/services/step_calculation_service.rb
 class StepCalculationService
   STEPS_PER_MILE = 2112
-  
+
   def self.miles_to_steps(miles)
     (miles * STEPS_PER_MILE).to_i
   end
-  
+
   def self.steps_to_miles(steps)
     (steps / STEPS_PER_MILE.to_f).round(2)
   end
@@ -545,43 +545,43 @@ end
 # app/jobs/daily_step_update_job.rb
 class DailyStepUpdateJob < ApplicationJob
   queue_as :default
-  
+
   def perform
     Rails.logger.info("Starting daily step update at #{Time.current}")
-    
+
     steps_data = GoogleSheetsService.new.fetch_user_steps
-    
+
     if steps_data.empty?
       Rails.logger.warn("No step data retrieved from Google Sheets")
       return
     end
-    
+
     User.find_each do |user|
       next unless steps_data.key?(user.email.downcase)
-      
+
       step = user.step
       next unless step.can_update_today?
-      
+
       new_steps = steps_data[user.email.downcase]
-      
+
       if step.add_steps(new_steps)
         # Update path progress
         active_path = Path.active.first
         path_user = user.current_position_on_path(active_path)
         path_user&.update_progress
-        
+
         Rails.logger.info("Updated #{user.name}: +#{new_steps} steps")
       else
         Rails.logger.error("Failed to update #{user.name}: #{step.errors.full_messages}")
       end
     end
-    
+
     # Check if we need to transition to Part 2
     active_path = Path.active.first
     if active_path&.all_users_completed? && active_path.part_number == 1
       PathTransitionService.new(active_path).transition_to_part_two
     end
-    
+
     Rails.logger.info("Daily step update completed")
   end
 end
@@ -678,7 +678,7 @@ users_data.each do |user_data|
     admin: user_data[:admin],
     token_color: user_data[:color]
   )
-  
+
   # Create path association
   PathUser.create!(
     user: user,
@@ -686,7 +686,7 @@ users_data.each do |user_data|
     current_milestone: part_one.milestones.first,
     progress_percentage: 0.0
   )
-  
+
   puts "Created user: #{user.name} (#{user.email})"
 end
 
@@ -703,17 +703,17 @@ puts "Admin user: frodo@shire.me"
 # config/routes.rb
 Rails.application.routes.draw do
   root 'dashboard#index'
-  
+
   get 'login', to: 'sessions#new'
   post 'login', to: 'sessions#create'
   delete 'logout', to: 'sessions#destroy'
-  
+
   resources :steps, only: [:index, :update] do
     member do
       patch :admin_update
     end
   end
-  
+
   # Health check for Heroku
   get 'up', to: 'rails/health#show', as: :rails_health_check
 end
@@ -727,17 +727,17 @@ end
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::Base
   helper_method :current_user, :logged_in?
-  
+
   before_action :require_login
-  
+
   def current_user
     @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
   end
-  
+
   def logged_in?
     !!current_user
   end
-  
+
   def require_login
     unless logged_in?
       redirect_to login_path, alert: "You must be logged in to access this page"
@@ -760,7 +760,7 @@ module Clockwork
   configure do |config|
     config[:tz] = 'America/Chicago' # CST
   end
-  
+
   # Run at 11:59 PM CST daily
   every(1.day, 'daily.step.update', at: '23:59') do
     DailyStepUpdateJob.perform_later
@@ -862,7 +862,7 @@ end
   <div class="w-3/4 relative bg-gradient-to-br from-green-900 to-green-700 p-8">
     <%= render 'map', path: @active_path, users: @users %>
   </div>
-  
+
   <!-- User Stats Section (25% width) -->
   <div class="w-1/4 bg-gray-900 text-white p-6 overflow-y-auto">
     <%= render 'user_stats', users: @users, current_user: @current_user %>
@@ -875,6 +875,34 @@ end
 - CSS animations for token movement
 - JavaScript to update token positions based on progress_percentage
 - Turbo Streams for real-time updates when steps are added
+
+#### How to make map
+- Map Display: Uses your map_of_middle_earth.svg as the background image
+- SVG Overlay Layer: A transparent SVG layer on top of the map that displays:
+
+- The journey path connecting all milestones (brown dashed line)
+- Milestone markers (red circles with gold borders) positioned at specific coordinates
+- User tokens (colored circles with initials) that move along the path
+
+#### Helper Methods:
+
+- path_coordinates() - Generates the SVG path connecting all milestones
+- calculate_token_position() - Interpolates each user's exact position between milestones based on their progress
+
+
+#### Positioning System:
+
+- Milestones have map_position_x and map_position_y coordinates (0-100 scale)
+- You'll need to adjust these coordinates in the seeds file to match actual locations on your SVG map
+- User tokens are offset slightly vertically so they don't overlap
+
+#### To get the coordinates right:
+
+- Open your SVG in a browser or editor
+- Use the coordinate system (usually 0-100 or based on viewBox)
+- Update the milestone coordinates in the seeds file to match actual map locations
+
+- The tokens will smoothly animate along the path as users add steps!
 
 ### User Stats Section
 - Display each user's current milestone

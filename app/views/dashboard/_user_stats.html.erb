@@ -1,0 +1,62 @@
+<!-- app/views/dashboard/_user_stats.html.erb -->
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="border-b border-gray-700 pb-4">
+    <h2 class="text-2xl font-bold text-yellow-500 mb-1" style="font-family: 'Cinzel', serif;">
+      Fellowship Progress
+    </h2>
+    <p class="text-sm text-gray-400 italic">
+      <%= @active_path.name %>
+    </p>
+  </div>
+
+  <!-- Current User Section (Highlighted) -->
+  <div class="bg-yellow-900 bg-opacity-30 border-2 border-yellow-600 rounded-lg p-4">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-3">
+        <div class="w-4 h-4 rounded-full"
+             style="background-color: <%= current_user.token_color %>;"></div>
+        <h3 class="text-xl font-bold text-white">
+          <%= current_user.name %> (You)
+        </h3>
+      </div>
+      <% if current_user.admin? %>
+        <span class="text-xs bg-yellow-600 text-stone-900 px-2 py-1 rounded font-bold">
+          ADMIN
+        </span>
+      <% end %>
+    </div>
+
+    <%= render 'user_step_form',
+               user: current_user,
+               step: current_user.step,
+               is_current_user: true %>
+  </div>
+
+  <!-- Other Users -->
+  <% users.reject { |u| u.id == current_user.id }.each do |user| %>
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition-colors">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-4 h-4 rounded-full"
+             style="background-color: <%= user.token_color %>;"></div>
+        <h3 class="text-lg font-semibold text-white">
+          <%= user.name %>
+        </h3>
+      </div>
+
+      <%= render 'user_step_form',
+                 user: user,
+                 step: user.step,
+                 is_current_user: false %>
+    </div>
+  <% end %>
+
+  <!-- Logout Button -->
+  <div class="pt-4 border-t border-gray-700">
+    <%= button_to "Leave Fellowship",
+                  logout_path,
+                  method: :delete,
+                  class: "w-full py-2 px-4 bg-red-800 hover:bg-red-900 text-white font-semibold rounded-md transition-colors duration-200",
+                  data: { turbo: false } %>
+  </div>
+</div>

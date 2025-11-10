@@ -1,9 +1,13 @@
+# app/controllers/dashboard_controller.rb
 class DashboardController < ApplicationController
-  before_action :require_login
-
   def index
-    @users = User.includes(:step, path_users: [ :current_milestone ]).all
-    @active_path = Path.active.includes(milestones: []).first
-    @current_user = current_user
+    if logged_in?
+      @users = User.includes(:step, path_users: [ :current_milestone ]).all
+      @active_path = Path.active.includes(milestones: []).first
+      @current_user = current_user
+    else
+      # Show login modal if not logged in
+      @show_login_modal = true
+    end
   end
 end

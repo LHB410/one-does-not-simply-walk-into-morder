@@ -1,23 +1,35 @@
+# app/controllers/sessions_controller.rb
 class SessionsController < ApplicationController
-  skip_before_action :require_login, only: [ :new, :create ]
-
-  def new
-    # Login modal
-  end
-
   def create
-    user = User.find_by(email: params[:email])
-    if user&.authenticate(params[:password])
+    credentials = params[:session] || params
+    email = credentials[:email]
+    password = credentials[:password]
+    user = User.find_by(email: email)
+    if user&.authenticate(password)
       session[:user_id] = user.id
-      redirect_to root_path
+      respond_to do |format|
+        # Force a full page visit so content conditioned on logged_in? re-renders
+        format.html { redirect_to root_path, turbo: false }
+        format.turbo_stream { redirect_to root_path, status: :see_other }
+      end
     else
-      flash.now[:alert] = "Invalid email or password"
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html {
+          redirect_to root_path, alert: "Invalid email or password"
+        }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.replace(
+            "login-error",
+            partial: "sessions/error",
+            locals: { error: "Invalid email or password" }
+          ), status: :unprocessable_entity
+        }
+      end
     end
   end
 
   def destroy
     session[:user_id] = nil
-    redirect_to login_path
+    redirect_to root_path
   end
 end

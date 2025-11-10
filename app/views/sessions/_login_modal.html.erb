@@ -1,0 +1,55 @@
+<!-- app/views/sessions/_login_modal.html.erb -->
+<div id="login-modal"
+     class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+     data-controller="modal">
+  <div class="bg-stone-800 rounded-lg shadow-2xl p-8 max-w-md w-full border-4 border-yellow-600">
+    <!-- LOTR Themed Header -->
+    <div class="text-center mb-6">
+      <h2 class="text-3xl font-bold text-yellow-500 mb-2" style="font-family: 'Cinzel', serif;">
+        The Fellowship Tracker
+      </h2>
+      <p class="text-gray-300 text-sm italic">
+        "Not all those who wander are lost"
+      </p>
+    </div>
+
+    <!-- Login Form -->
+    <%= simple_form_for :session,
+                        url: login_path,
+                        method: :post,
+                        html: { data: { turbo: true } } do |f| %>
+      <div id="login-error" class="hidden">
+        <!-- Error messages will be inserted here -->
+      </div>
+
+      <%= f.input :email,
+          required: true,
+          autofocus: true,
+          placeholder: "frodo@shire.me",
+          input_html: {
+            class: "w-full px-4 py-2 bg-stone-700 border border-yellow-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          },
+          wrapper_html: { class: 'mb-4' },
+          label_html: { class: 'block text-sm font-medium text-gray-300 mb-2' } %>
+
+      <%= f.input :password,
+          required: true,
+          placeholder: "Enter your password",
+          input_html: {
+            class: "w-full px-4 py-2 bg-stone-700 border border-yellow-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          },
+          wrapper_html: { class: 'mb-6' },
+          label_html: { class: 'block text-sm font-medium text-gray-300 mb-2' } %>
+
+      <%= f.button :submit,
+          "Begin Journey",
+          class: "w-full py-3 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+    <% end %>
+
+    <!-- Helper Text -->
+    <div class="mt-6 text-center text-xs text-gray-400">
+      <p>Members of the Fellowship only</p>
+      <p class="mt-1">Default password: password123</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,119 @@
+<!-- app/views/dashboard/_user_step_form.html.erb -->
+<div class="space-y-3" data-controller="step-form" data-step-form-user-id="<%= user.id %>">
+  <!-- Stats Display -->
+  <div class="grid grid-cols-2 gap-3 text-sm">
+    <div class="bg-gray-900 bg-opacity-50 rounded p-2">
+      <p class="text-gray-400 text-xs mb-1">Total Steps</p>
+      <p class="text-white font-bold text-lg">
+        <%= number_with_delimiter(step.total_steps) %>
+      </p>
+      <p class="text-gray-400 text-xs">
+        <%= step.total_miles %> miles
+      </p>
+    </div>
+
+    <div class="bg-gray-900 bg-opacity-50 rounded p-2">
+      <p class="text-gray-400 text-xs mb-1">Today's Steps</p>
+      <p class="text-white font-bold text-lg">
+        <%= number_with_delimiter(step.steps_today) %>
+      </p>
+      <p class="text-gray-400 text-xs">
+        <%= step.miles_today %> miles
+      </p>
+    </div>
+  </div>
+
+  <!-- Current Location -->
+  <div class="bg-gray-900 bg-opacity-50 rounded p-3">
+    <p class="text-gray-400 text-xs mb-1">Current Location</p>
+    <% milestones = @active_path&.milestones || [] %>
+    <% user_miles = user.step.total_miles %>
+    <% prev_milestone = milestones.select { |m| m.cumulative_distance_miles <= user_miles }.last %>
+    <% upcoming_milestone = milestones.select { |m| m.cumulative_distance_miles > user_miles }.first %>
+    <% location_text =
+        if prev_milestone && upcoming_milestone
+          "On the road from #{prev_milestone.name} to #{upcoming_milestone.name}"
+        elsif prev_milestone
+          prev_milestone.name
+        else
+          "The Shire"
+        end %>
+    <p class="text-yellow-400 font-semibold"><%= location_text %></p>
+    <% path_user = user.current_position_on_path(@active_path) %>
+    <div class="mt-2">
+      <div class="flex justify-between text-xs text-gray-400 mb-1">
+        <span>Progress</span>
+        <span><%= path_user&.progress_percentage&.round(1) || 0 %>%</span>
+      </div>
+      <div class="w-full bg-gray-700 rounded-full h-2">
+        <div class="bg-yellow-600 h-2 rounded-full transition-all duration-500"
+             style="width: <%= path_user&.progress_percentage || 0 %>%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Next Milestone Info -->
+  <div class="bg-gray-900 bg-opacity-50 rounded p-3">
+    <p class="text-gray-400 text-xs mb-1">Until Next Milestone</p>
+    <p class="text-white font-bold">
+      <%= number_with_delimiter(step.steps_until_next_milestone) %> steps
+    </p>
+    <p class="text-gray-400 text-xs">
+      <%= step.miles_until_next_milestone %> miles
+    </p>
+  </div>
+
+  <!-- Step Input Form -->
+  <% can_update = is_current_user ? step.can_update_today? : current_user.admin? %>
+
+  <%= simple_form_for step,
+                      url: is_current_user ? step_path(step) : admin_update_step_path(step),
+                      method: :patch,
+                      html: {
+                        data: {
+                          turbo: false,
+                          step_form_target: "form"
+                        }
+                      } do |f| %>
+
+    <%# Admin override flag so server can bypass daily limit %>
+    <% unless is_current_user %>
+      <%= hidden_field_tag :force, '1' %>
+    <% end %>
+
+    <%= label_tag :steps, "Add Steps", class: 'block text-sm font-medium text-gray-300 mb-1' %>
+    <%= number_field_tag :steps,
+        nil,
+        min: 1,
+        placeholder: "Enter steps",
+        disabled: !can_update,
+        class: "w-full px-3 py-2 bg-gray-700 border #{can_update ? 'border-gray-600' : 'border-gray-800'} rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 #{!can_update ? 'opacity-50 cursor-not-allowed' : ''}" %>
+
+    <% if can_update %>
+      <%= f.button :submit,
+          "Update Steps",
+          class: "w-full py-2 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+    <% else %>
+      <div class="w-full py-2 px-4 bg-gray-700 text-gray-400 font-semibold rounded-md text-center text-sm">
+        <% if is_current_user %>
+          Steps already updated today
+        <% else %>
+          <%= user.name %>'s steps already updated
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if !is_current_user && current_user.admin? %>
+      <p class="text-xs text-yellow-500 text-center italic mt-2">
+        Admin Override Enabled
+      </p>
+    <% end %>
+  <% end %>
+
+  <!-- Last Updated -->
+  <% if step.last_updated_date %>
+    <p class="text-xs text-gray-500 text-center mt-2">
+      Last updated: <%= step.last_updated_date.strftime("%B %d, %Y") %>
+    </p>
+  <% end %>
+</div>

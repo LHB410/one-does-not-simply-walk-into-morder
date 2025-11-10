@@ -25,8 +25,8 @@ class Step < ApplicationRecord
     (steps_until_mordor / STEPS_PER_MILE.to_f).round(2)
   end
 
-  def add_steps(new_steps)
-    return false unless can_update_today?
+  def add_steps(new_steps, force: false)
+    return false unless can_update_today? || force
 
     self.steps_today = new_steps
     self.total_steps += new_steps

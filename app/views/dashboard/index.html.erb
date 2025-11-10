@@ -1,2 +1,29 @@
-<h1>Dashboard#index</h1>
-<p>Find me in app/views/dashboard/index.html.erb</p>
+<!-- app/views/dashboard/index.html.erb -->
+<% if @show_login_modal %>
+  <%= render 'sessions/login_modal' %>
+<% end %>
+
+<div class="flex h-screen">
+  <!-- Map Section (75% width) -->
+  <div class="w-3/4 relative bg-gradient-to-br from-amber-50 to-amber-100 p-8 overflow-hidden">
+    <% if logged_in? %>
+      <%= render 'map', path: @active_path, users: @users %>
+    <% else %>
+      <!-- Blurred/dimmed map when not logged in -->
+      <div class="w-full h-full flex items-center justify-center bg-gray-900 opacity-50">
+        <p class="text-white text-3xl font-bold">Please log in to view the journey</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- User Stats Section (25% width) -->
+  <div class="w-1/4 bg-gray-900 text-white p-6 overflow-y-auto">
+    <% if logged_in? %>
+      <%= render 'user_stats', users: @users, current_user: @current_user %>
+    <% else %>
+      <div class="flex items-center justify-center h-full">
+        <p class="text-gray-400">Login to view stats</p>
+      </div>
+    <% end %>
+  </div>
+</div>
