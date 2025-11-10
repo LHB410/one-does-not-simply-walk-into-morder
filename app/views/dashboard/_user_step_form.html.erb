@@ -29,21 +29,23 @@
     <% milestones = @active_path&.milestones || [] %>
     <% user_miles = user.step.total_miles %>
     <% prev_milestone = milestones.select { |m| m.cumulative_distance_miles <= user_miles }.last %>
-    <% upcoming_milestone = milestones.select { |m| m.cumulative_distance_miles > user_miles }.first %>
+    <% upcoming_milestone = milestones.select { |m| m.cumulative_distance_miles > user_miles }.first || milestones.first %> <!-- Fallback to first milestone if none found -->
+
     <% location_text =
         if prev_milestone && upcoming_milestone
           "On the road from #{prev_milestone.name} to #{upcoming_milestone.name}"
         elsif prev_milestone
           prev_milestone.name
         else
-          "The Shire"
+          "The Shire" # If no previous milestone, start from the Shire
         end %>
     <p class="text-yellow-400 font-semibold"><%= location_text %></p>
+
     <% path_user = user.current_position_on_path(@active_path) %>
     <div class="mt-2">
       <div class="flex justify-between text-xs text-gray-400 mb-1">
         <span>Progress</span>
-        <span><%= path_user&.progress_percentage&.round(1) || 0 %>%</span>
+        <span><%= path_user&.progress_percentage.to_f.round(1) || 0 %>%</span>
       </div>
       <div class="w-full bg-gray-700 rounded-full h-2">
         <div class="bg-yellow-600 h-2 rounded-full transition-all duration-500"

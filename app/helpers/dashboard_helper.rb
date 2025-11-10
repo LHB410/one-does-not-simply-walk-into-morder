@@ -19,12 +19,26 @@ module DashboardHelper
     next_milestone = path.next_milestone_after(current_milestone)
 
     if next_milestone && path_user.progress_percentage < 100
-      # Interpolate between current and next milestone
       user_miles = path_user.user.total_miles
-      miles_from_current = user_miles - current_milestone.cumulative_distance_miles
-      miles_to_next = next_milestone.cumulative_distance_miles - current_milestone.cumulative_distance_miles
 
+      # Ensure non-negative miles values
+      miles_from_current = user_miles - current_milestone.cumulative_distance_miles
+      miles_from_current = miles_from_current < 0 ? 0 : miles_from_current  # Ensure non-negative
+
+      miles_to_next = next_milestone.cumulative_distance_miles - current_milestone.cumulative_distance_miles
+      miles_to_next = miles_to_next < 0 ? 0 : miles_to_next  # Ensure non-negative
+
+      # Calculate progress fraction with bounds
       progress_fraction = miles_to_next > 0 ? (miles_from_current / miles_to_next.to_f) : 0
+      progress_fraction = [ 0, [ progress_fraction, 1 ].min ].max  # Ensure the fraction is between 0 and 1
+
+      # Debugging: Log the calculated values
+      puts "miles_from_current: #{miles_from_current}, miles_to_next: #{miles_to_next}, progress_fraction: #{progress_fraction}"
+
+      if progress_fraction == 1
+        # User has reached the next milestone, so update to the next milestone
+        path_user.update!(current_milestone_id: next_milestone.id)
+      end
 
       x = current_milestone.map_position_x +
           (next_milestone.map_position_x - current_milestone.map_position_x) * progress_fraction
