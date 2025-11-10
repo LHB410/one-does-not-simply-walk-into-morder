@@ -27,7 +27,7 @@
         <!-- Marker Circle -->
         <circle cx="<%= milestone.map_position_x %>"
                 cy="<%= milestone.map_position_y %>"
-                r="1.5"
+                r="0.8"
                 fill="#8B0000"
                 stroke="#FFD700"
                 stroke-width="0.3" />
@@ -35,7 +35,7 @@
         <!-- Milestone Name -->
         <text x="<%= milestone.map_position_x %>"
               y="<%= milestone.map_position_y - 2 %>"
-              font-size="2"
+              font-size="0"
               fill="#2C1810"
               font-weight="bold"
               text-anchor="middle"
@@ -52,8 +52,7 @@
 
       <g class="user-token"
          data-user-id="<%= user.id %>"
-         data-turbo-permanent
-         style="transform: translate(<%= position[:x] %>px, <%= position[:y] %>px);">
+         data-turbo-permanent>
 
         <!-- Token Circle with User Color -->
         <circle cx="<%= position[:x] %>"

@@ -26,14 +26,14 @@ part_one = Path.create!(
 
 # Part 1 Milestones with distances
 milestones_part_one = [
-  { name: "Shire", distance: 0, cumulative: 0, x: 10, y: 80 },
-  { name: "Rivendell", distance: 458, cumulative: 458, x: 25, y: 60 },
-  { name: "Moria", distance: 200, cumulative: 658, x: 35, y: 55 },
-  { name: "Lothlórien", distance: 112, cumulative: 770, x: 45, y: 50 },
-  { name: "Falls of Rauros", distance: 389, cumulative: 1159, x: 60, y: 45 },
-  { name: "Dead Marshes", distance: 90, cumulative: 1249, x: 75, y: 35 },
-  { name: "Shelob's Lair", distance: 80, cumulative: 1329, x: 85, y: 25 },
-  { name: "Mount Doom", distance: 21, cumulative: 1350, x: 90, y: 20 }
+  { name: "Shire", distance: 0, cumulative: 0, x: 21.10, y: 27.42 },
+  { name: "Rivendell", distance: 458, cumulative: 458, x: 47.73, y: 26.82 },
+  { name: "Moria", distance: 200, cumulative: 658, x: 45.96, y: 38.66 },
+  { name: "Lothlórien", distance: 112, cumulative: 770, x: 52.66, y: 41.22 },
+  { name: "Falls of Rauros", distance: 389, cumulative: 1159, x: 62.52, y: 61.54 },
+  { name: "Dead Marshes", distance: 90, cumulative: 1249, x: 66.47, y: 60.55 },
+  { name: "Shelob's Lair", distance: 80, cumulative: 1329, x: 73.18, y: 68.44 },
+  { name: "Mount Doom", distance: 21, cumulative: 1350, x: 77.71, y: 65.68 }
 ]
 
 milestones_part_one.each_with_index do |milestone_data, index|
@@ -57,8 +57,8 @@ part_two = Path.create!(
 )
 
 milestones_part_two = [
-  { name: "Shire", distance: 0, cumulative: 0, x: 10, y: 80 },
-  { name: "Grey Havens", distance: 200, cumulative: 200, x: 5, y: 60 }
+  { name: "Shire", distance: 0, cumulative: 0, x: 21.10, y: 27.42 },
+  { name: "Grey Havens", distance: 200, cumulative: 200, x: 7.10, y: 24.65 }
 ]
 
 milestones_part_two.each_with_index do |milestone_data, index|
