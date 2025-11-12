@@ -23,7 +23,9 @@ class Path < ApplicationRecord
   end
 
   def milestone_for_distance(miles)
-    milestones.where("cumulative_distance_miles >= ?", miles).first
+    milestones.where("cumulative_distance_miles <= ?", miles)
+              .order(cumulative_distance_miles: :desc)
+              .first || milestones.first
   end
 
   def all_users_completed?
