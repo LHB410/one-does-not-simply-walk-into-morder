@@ -8,8 +8,11 @@ class PathUser < ApplicationRecord
 
   def update_progress
     user_miles = user.total_miles
+    before = current_milestone&.name
     self.current_milestone = path.milestone_for_distance(user_miles)
+    after = current_milestone&.name
     self.progress_percentage = (user_miles / path.total_distance_miles.to_f * 100).round(2)
+    puts "[PathUser#update_progress] user_id=#{user_id} miles=#{user_miles} milestone: #{before} -> #{after} progress=#{progress_percentage}%"
     save
   end
 end

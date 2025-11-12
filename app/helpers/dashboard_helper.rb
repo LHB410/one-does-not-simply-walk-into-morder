@@ -13,45 +13,34 @@ module DashboardHelper
   end
 
   def calculate_token_position(path_user, path)
-    return { x: 10, y: 80 } unless path_user&.current_milestone
+  return { x: 10, y: 80 } unless path_user&.current_milestone
 
-    current_milestone = path_user.current_milestone
-    next_milestone = path.next_milestone_after(current_milestone)
+  current_milestone = path_user.current_milestone
+  next_milestone = path.next_milestone_after(current_milestone)
 
-    if next_milestone && path_user.progress_percentage < 100
-      user_miles = path_user.user.total_miles
+  if next_milestone && path_user.progress_percentage < 100
+    # Compute segment progress using steps to avoid rounding snaps
+    current_steps = (current_milestone.cumulative_distance_miles * Step::STEPS_PER_MILE)
+    next_steps    = (next_milestone.cumulative_distance_miles * Step::STEPS_PER_MILE)
 
-      # Ensure non-negative miles values
-      miles_from_current = user_miles - current_milestone.cumulative_distance_miles
-      miles_from_current = miles_from_current < 0 ? 0 : miles_from_current  # Ensure non-negative
+    steps_from_current = [ path_user.user.step.total_steps - current_steps, 0 ].max
+    steps_to_next      = [ next_steps - current_steps, 0 ].max
 
-      miles_to_next = next_milestone.cumulative_distance_miles - current_milestone.cumulative_distance_miles
-      miles_to_next = miles_to_next < 0 ? 0 : miles_to_next  # Ensure non-negative
+    progress_fraction =
+      steps_to_next.positive? ? (steps_from_current / steps_to_next.to_f) : 0.0
+    progress_fraction = progress_fraction.clamp(0.0, 1.0)
 
-      # Calculate progress fraction with bounds
-      progress_fraction = miles_to_next > 0 ? (miles_from_current / miles_to_next.to_f) : 0
-      progress_fraction = [ 0, [ progress_fraction, 1 ].min ].max  # Ensure the fraction is between 0 and 1
+    puts "[DashboardHelper#calculate_token_position] user_id=#{path_user.user_id} current=#{current_milestone.name}(cum=#{current_milestone.cumulative_distance_miles}) next=#{next_milestone.name}(cum=#{next_milestone.cumulative_distance_miles}) total_steps=#{path_user.user.step.total_steps} steps_from_current=#{steps_from_current} steps_to_next=#{steps_to_next} fraction=#{progress_fraction}"
 
-      # Debugging: Log the calculated values
-      puts "miles_from_current: #{miles_from_current}, miles_to_next: #{miles_to_next}, progress_fraction: #{progress_fraction}"
+    # Interpolate along the segment without mutating DB state here
+    x = current_milestone.map_position_x +
+        (next_milestone.map_position_x - current_milestone.map_position_x) * progress_fraction
+    y = current_milestone.map_position_y +
+        (next_milestone.map_position_y - current_milestone.map_position_y) * progress_fraction
 
-      if progress_fraction == 1
-        # User has reached the next milestone, so update to the next milestone
-        path_user.update!(current_milestone_id: next_milestone.id)
-      end
-
-      x = current_milestone.map_position_x +
-          (next_milestone.map_position_x - current_milestone.map_position_x) * progress_fraction
-      y = current_milestone.map_position_y +
-          (next_milestone.map_position_y - current_milestone.map_position_y) * progress_fraction
-
-      { x: x, y: y }
-    else
-      # At milestone
-      {
-        x: current_milestone.map_position_x,
-        y: current_milestone.map_position_y
-      }
-    end
+    { x: x, y: y }
+  else
+    { x: current_milestone.map_position_x, y: current_milestone.map_position_y }
+  end
   end
 end
