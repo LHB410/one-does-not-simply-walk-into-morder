@@ -10,31 +10,19 @@ class Step < ApplicationRecord
   end
 
   def total_miles
-    raw_miles = total_steps / STEPS_PER_MILE.to_f
-    rounded = raw_miles.round(2)
-    puts "[Step#total_miles] user_id=#{user_id} total_steps=#{total_steps} raw_miles=#{raw_miles} rounded=#{rounded}"
-    rounded
+    (total_steps / STEPS_PER_MILE.to_f).round(2)
   end
 
   def miles_today
-    raw = steps_today / STEPS_PER_MILE.to_f
-    rounded = raw.round(2)
-    puts "[Step#miles_today] user_id=#{user_id} steps_today=#{steps_today} raw=#{raw} rounded=#{rounded}"
-    rounded
+    (steps_today / STEPS_PER_MILE.to_f).round(2)
   end
 
   def miles_until_next_milestone
-    raw = steps_until_next_milestone / STEPS_PER_MILE.to_f
-    rounded = raw.round(2)
-    puts "[Step#miles_until_next_milestone] user_id=#{user_id} steps_until_next_milestone=#{steps_until_next_milestone} raw=#{raw} rounded=#{rounded}"
-    rounded
+    (steps_until_next_milestone / STEPS_PER_MILE.to_f).round(2)
   end
 
   def miles_until_mordor
-    raw = steps_until_mordor / STEPS_PER_MILE.to_f
-    rounded = raw.round(2)
-    puts "[Step#miles_until_mordor] user_id=#{user_id} steps_until_mordor=#{steps_until_mordor} raw=#{raw} rounded=#{rounded}"
-    rounded
+    (steps_until_mordor / STEPS_PER_MILE.to_f).round(2)
   end
 
   def add_steps(new_steps, force: false)
@@ -43,7 +31,6 @@ class Step < ApplicationRecord
     self.steps_today = new_steps
     self.total_steps += new_steps
     self.last_updated_date = Date.current
-    puts "[Step#add_steps] user_id=#{user_id} +#{new_steps} steps total_steps=#{total_steps} last_updated_date=#{last_updated_date} force=#{force}"
 
     recalculate_distances
     save

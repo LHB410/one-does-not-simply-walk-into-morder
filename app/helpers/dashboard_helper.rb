@@ -30,8 +30,6 @@ module DashboardHelper
       steps_to_next.positive? ? (steps_from_current / steps_to_next.to_f) : 0.0
     progress_fraction = progress_fraction.clamp(0.0, 1.0)
 
-    puts "[DashboardHelper#calculate_token_position] user_id=#{path_user.user_id} current=#{current_milestone.name}(cum=#{current_milestone.cumulative_distance_miles}) next=#{next_milestone.name}(cum=#{next_milestone.cumulative_distance_miles}) total_steps=#{path_user.user.step.total_steps} steps_from_current=#{steps_from_current} steps_to_next=#{steps_to_next} fraction=#{progress_fraction}"
-
     # Interpolate along the segment without mutating DB state here
     x = current_milestone.map_position_x +
         (next_milestone.map_position_x - current_milestone.map_position_x) * progress_fraction

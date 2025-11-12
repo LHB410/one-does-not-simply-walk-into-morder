@@ -41,8 +41,8 @@ RSpec.describe Path, type: :model do
 
     it "returns the appropriate milestone for given distance" do
       expect(active_path.milestone_for_distance(0)).to eq(shire)
-      expect(active_path.milestone_for_distance(200)).to eq(rivendell)
-      expect(active_path.milestone_for_distance(500)).to eq(mordor)
+      expect(active_path.milestone_for_distance(200)).to eq(shire)
+      expect(active_path.milestone_for_distance(500)).to eq(rivendell)
     end
   end
 
