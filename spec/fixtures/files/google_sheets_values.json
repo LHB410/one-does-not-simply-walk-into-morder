@@ -1,0 +1,10 @@
+{
+  "values": [
+    ["frodo@shire.me", "5000"],
+    ["sam@shire.me", "6200"],
+    ["invalid@example.com", "not_a_number"],
+    ["  pippin@SHIRE.me  ", "4800"]
+  ]
+}
+
+

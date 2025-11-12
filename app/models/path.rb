@@ -23,9 +23,18 @@ class Path < ApplicationRecord
   end
 
   def milestone_for_distance(miles)
-    milestones.where("cumulative_distance_miles <= ?", miles)
-              .order(cumulative_distance_miles: :desc)
-              .first || milestones.first
+    miles_int = miles.to_i
+
+    ordered = milestones.reorder(nil) # drop default order(:sequence_order)
+
+    # Next milestone at or beyond this distance (e.g., 200 -> Rivendell)
+    next_milestone = ordered
+      .where("cumulative_distance_miles >= ?", miles_int)
+      .order(cumulative_distance_miles: :asc)
+      .first
+
+    # If we've passed the end, return the last milestone
+    next_milestone || ordered.order(cumulative_distance_miles: :desc).first
   end
 
   def all_users_completed?

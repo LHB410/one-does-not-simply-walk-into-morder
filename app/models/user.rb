@@ -36,6 +36,11 @@ class User < ApplicationRecord
   end
 
   def calculate_initial_steps_to_next_milestone
-    Path.active.first&.milestones&.first&.distance_from_previous_miles_to_steps || 0
+    path = Path.active.first
+    return 0 unless path
+
+    # From the starting point (0 miles) the "next milestone" is the second one in order.
+    next_milestone = path.milestones.order(:sequence_order).second
+    next_milestone ? next_milestone.distance_from_previous_miles_to_steps : 0
   end
 end
