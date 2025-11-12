@@ -13,5 +13,3 @@ RSpec.shared_context "authenticated admin" do
     session[:user_id] = admin.id
   end
 end
-
-

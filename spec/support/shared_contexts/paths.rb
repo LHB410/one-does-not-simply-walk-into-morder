@@ -53,5 +53,3 @@ RSpec.shared_context "user with path progress" do
     )
   end
 end
-
-

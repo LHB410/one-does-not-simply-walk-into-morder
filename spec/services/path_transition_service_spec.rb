@@ -83,5 +83,3 @@ RSpec.describe PathTransitionService do
     end
   end
 end
-
-

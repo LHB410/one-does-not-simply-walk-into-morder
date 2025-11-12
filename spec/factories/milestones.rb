@@ -9,5 +9,3 @@ FactoryBot.define do
     map_position_y { 50.0 }
   end
 end
-
-

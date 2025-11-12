@@ -9,16 +9,16 @@ RSpec.describe DailyStepUpdateJob, type: :job do
   let!(:path_user2) { create(:path_user, user: user2, path: active_path) }
 
   let(:sheets_service) { instance_double(GoogleSheetsService) }
-  let(:steps_data) do
-    {
-      'frodo@shire.me' => 5000,
-      'sam@shire.me' => 6200
-    }
+  let(:rows_today) do
+    [
+      [ 'frodo@shire.me', '5000', Date.current.in_time_zone('America/Chicago').to_s ],
+      [ 'sam@shire.me', '6200', Date.current.in_time_zone('America/Chicago').to_s ]
+    ]
   end
 
   before do
     allow(GoogleSheetsService).to receive(:new).and_return(sheets_service)
-    allow(sheets_service).to receive(:fetch_user_steps).and_return(steps_data)
+    allow(sheets_service).to receive(:fetch_user_steps_rows).and_return(rows_today)
   end
 
   describe "#perform" do
@@ -26,9 +26,26 @@ RSpec.describe DailyStepUpdateJob, type: :job do
       allow_any_instance_of(User).to receive(:total_miles).and_return(2)
     end
     it "fetches data from Google Sheets" do
-      expect(sheets_service).to receive(:fetch_user_steps)
+      expect(sheets_service).to receive(:fetch_user_steps_rows)
 
       described_class.perform_now
+    end
+
+    context "when sheet rows are stale (not today)" do
+      it "skips updates for all users" do
+        stale_rows = [
+          [ 'frodo@shire.me', '5000', (Date.current - 1).to_s ],
+          [ 'sam@shire.me', '6200', (Date.current - 1).to_s ]
+        ]
+        allow(sheets_service).to receive(:fetch_user_steps_rows).and_return(stale_rows)
+        expect {
+          described_class.perform_now
+        }.not_to change { user1.step.reload.total_steps }
+
+        expect {
+          described_class.perform_now
+        }.not_to change { user2.step.reload.total_steps }
+      end
     end
 
     it "updates all users steps" do
@@ -72,7 +89,7 @@ RSpec.describe DailyStepUpdateJob, type: :job do
 
     context "when no data retrieved" do
       before do
-        allow(sheets_service).to receive(:fetch_user_steps).and_return({})
+        allow(sheets_service).to receive(:fetch_user_steps_rows).and_return([])
       end
 
       it "logs warning and exits early" do
@@ -100,5 +117,3 @@ RSpec.describe DailyStepUpdateJob, type: :job do
     end
   end
 end
-
-

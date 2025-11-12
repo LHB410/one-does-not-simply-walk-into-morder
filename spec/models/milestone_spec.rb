@@ -25,5 +25,3 @@ RSpec.describe Milestone, type: :model do
     end
   end
 end
-
-

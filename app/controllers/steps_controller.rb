@@ -31,7 +31,8 @@ class StepsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to root_path, notice: "Steps updated successfully!" }
         format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.any { redirect_to root_path, status: :see_other }
+        format.json { render json: { success: true, step: step_json(@step) }, status: :ok }
+        format.any { head :ok }
       end
     else
       respond_to do |format|
@@ -40,7 +41,8 @@ class StepsController < ApplicationController
           alert: "Failed to update steps: #{@step.errors.full_messages.join(', ')}"
         }
         format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.any { redirect_to root_path, status: :see_other }
+        format.json { render json: { error: "Failed to update steps" }, status: :unprocessable_entity }
+        format.any { head :unprocessable_entity }
       end
     end
   end
@@ -60,7 +62,8 @@ class StepsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to root_path, notice: "Steps updated successfully!" }
         format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.any { redirect_to root_path, status: :see_other }
+        format.json { render json: { success: true, step: step_json(@step) }, status: :ok }
+        format.any { head :ok }
       end
     else
       respond_to do |format|
@@ -69,7 +72,8 @@ class StepsController < ApplicationController
           alert: "Failed to update steps: #{@step.errors.full_messages.join(', ')}"
         }
         format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.any { redirect_to root_path, status: :see_other }
+        format.json { render json: { error: "Failed to update steps" }, status: :unprocessable_entity }
+        format.any { head :unprocessable_entity }
       end
     end
   end

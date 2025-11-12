@@ -6,5 +6,3 @@ FactoryBot.define do
     progress_percentage { 0.0 }
   end
 end
-
-

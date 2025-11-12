@@ -41,18 +41,19 @@ class Step < ApplicationRecord
   def recalculate_distances
   active_path = Path.active.first
   return unless active_path
+  current_miles = total_steps / STEPS_PER_MILE.to_f
 
   path_user = user.current_position_on_path(active_path)
   current_milestone = path_user&.current_milestone || active_path.milestones.first # Use first milestone if user is at the start
 
   if current_milestone
     # If user is at the first milestone, assume it's the starting point (0 miles)
-    remaining_distance = active_path.remaining_distance_from_milestone(current_milestone, total_miles)
+    remaining_distance = active_path.remaining_distance_from_milestone(current_milestone, current_miles)
     self.steps_until_mordor = (remaining_distance * STEPS_PER_MILE).to_i
 
     next_milestone = active_path.next_milestone_after(current_milestone)
     if next_milestone
-      distance_to_next = next_milestone.cumulative_distance_miles - total_miles
+      distance_to_next = next_milestone.cumulative_distance_miles - current_miles
       self.steps_until_next_milestone = (distance_to_next * STEPS_PER_MILE).to_i
     else
       self.steps_until_next_milestone = 0 # No more milestones, i.e., Mordor reached
