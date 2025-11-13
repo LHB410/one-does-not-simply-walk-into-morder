@@ -8,8 +8,6 @@ module Clockwork
 
   # Run at 11:59 PM CST daily
   every(1.day, "daily.step.update", at: "23:59") do
-    DailyStepUpdateJob.perform_later
+    DailyStepUpdateJob.perform_now
   end
 end
-
-
