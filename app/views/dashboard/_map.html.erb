@@ -1,78 +1,95 @@
 <!-- app/views/dashboard/_map.html.erb -->
-<div class="relative w-full h-full">
-  <!-- Background Map SVG -->
-  <div class="absolute inset-0">
-    <%= image_tag 'map_of_middle_earth.svg',
-                  class: 'w-full h-full object-contain',
-                  alt: 'Map of Middle Earth' %>
+<%# Compute center target once %>
+<% begin %>
+  <% if defined?(current_user) && current_user.present? %>
+    <% cu_path_user = current_user.current_position_on_path(path) %>
+    <% cu_pos = cu_path_user ? calculate_token_position(cu_path_user, path) : nil %>
+  <% end %>
+<% rescue => e %>
+  <% cu_pos = nil %>
+<% end %>
+
+<div class="relative w-full h-full"
+     data-controller="map-zoom"
+     data-map-zoom-initial-scale-value="1.0"
+     data-map-zoom-center-x-value="50"
+     data-map-zoom-center-y-value="50">
+  <div data-map-zoom-target="content" class="absolute inset-0 origin-center">
+    <!-- Background Map SVG -->
+    <div class="absolute inset-0">
+      <%= image_tag 'map_of_middle_earth.svg',
+                    class: 'w-full h-full object-contain',
+                    alt: 'Map of Middle Earth' %>
+    </div>
+
+    <!-- Overlay for Path and Tokens -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none"
+         viewBox="0 0 100 100"
+         preserveAspectRatio="xMidYMid meet">
+
+      <!-- The Journey Path -->
+      <path id="journey-path"
+            d="<%= path_coordinates(path) %>"
+            stroke="#DC143C"
+            stroke-width="0.5"
+            fill="none"
+            stroke-dasharray="1,1"
+            opacity="1" />
+
+      <!-- Milestone Markers -->
+      <% path&.milestones&.each do |milestone| %>
+        <g class="milestone-marker" data-milestone-id="<%= milestone.id %>">
+          <!-- Marker Circle -->
+          <circle cx="<%= milestone.map_position_x %>"
+                  cy="<%= milestone.map_position_y %>"
+                  r="0.8"
+                  fill="#8B0000"
+                  stroke="#FFD700"
+                  stroke-width="0.3" />
+
+          <!-- Milestone Name -->
+          <text x="<%= milestone.map_position_x %>"
+                y="<%= milestone.map_position_y - 2 %>"
+                font-size="0"
+                fill="#2C1810"
+                font-weight="bold"
+                text-anchor="middle"
+                class="pointer-events-auto">
+            <%= milestone.name %>
+          </text>
+        </g>
+      <% end %>
+
+      <!-- User Tokens -->
+      <% users.each_with_index do |user, index| %>
+        <% path_user = user.current_position_on_path(path) %>
+        <% position = calculate_token_position(path_user, path) %>
+
+        <g class="user-token"
+           data-user-id="<%= user.id %>"
+           <%= (defined?(current_user) && current_user && user.id == current_user.id) ? 'data-current-user="true"' : '' %>
+           data-turbo-permanent>
+
+          <!-- Token Circle with User Color -->
+          <circle cx="<%= position[:x] %>"
+                  cy="<%= position[:y] + (index * 0.1) %>"
+                  r="1"
+                  fill="<%= user.token_color %>"
+                  stroke="white"
+                  stroke-width="0.2"
+                  class="transition-all duration-1000 ease-in-out" />
+
+          <!-- User Initial -->
+          <text x="<%= position[:x] %>"
+                y="<%= position[:y] + (index * 0.1) + 0.5 %>"
+                font-size="1.2"
+                fill="white"
+                font-weight="bold"
+                text-anchor="middle">
+            <%= user.name[0] %>
+          </text>
+        </g>
+      <% end %>
+    </svg>
   </div>
-
-  <!-- Overlay for Path and Tokens -->
-  <svg class="absolute inset-0 w-full h-full pointer-events-none"
-       viewBox="0 0 100 100"
-       preserveAspectRatio="xMidYMid meet">
-
-    <!-- The Journey Path -->
-    <path id="journey-path"
-          d="<%= path_coordinates(path) %>"
-          stroke="#DC143C"
-          stroke-width="0.5"
-          fill="none"
-          stroke-dasharray="1,1"
-          opacity="1" />
-
-    <!-- Milestone Markers -->
-    <% path&.milestones&.each do |milestone| %>
-      <g class="milestone-marker" data-milestone-id="<%= milestone.id %>">
-        <!-- Marker Circle -->
-        <circle cx="<%= milestone.map_position_x %>"
-                cy="<%= milestone.map_position_y %>"
-                r="0.8"
-                fill="#8B0000"
-                stroke="#FFD700"
-                stroke-width="0.3" />
-
-        <!-- Milestone Name -->
-        <text x="<%= milestone.map_position_x %>"
-              y="<%= milestone.map_position_y - 2 %>"
-              font-size="0"
-              fill="#2C1810"
-              font-weight="bold"
-              text-anchor="middle"
-              class="pointer-events-auto">
-          <%= milestone.name %>
-        </text>
-      </g>
-    <% end %>
-
-    <!-- User Tokens -->
-    <% users.each_with_index do |user, index| %>
-      <% path_user = user.current_position_on_path(path) %>
-      <% position = calculate_token_position(path_user, path) %>
-
-      <g class="user-token"
-         data-user-id="<%= user.id %>"
-         data-turbo-permanent>
-
-        <!-- Token Circle with User Color -->
-        <circle cx="<%= position[:x] %>"
-                cy="<%= position[:y] + (index * 0.1) %>"
-                r="1"
-                fill="<%= user.token_color %>"
-                stroke="white"
-                stroke-width="0.2"
-                class="transition-all duration-1000 ease-in-out" />
-
-        <!-- User Initial -->
-        <text x="<%= position[:x] %>"
-              y="<%= position[:y] + (index * 0.1) + 0.5 %>"
-              font-size="1.2"
-              fill="white"
-              font-weight="bold"
-              text-anchor="middle">
-          <%= user.name[0] %>
-        </text>
-      </g>
-    <% end %>
-  </svg>
 </div>
