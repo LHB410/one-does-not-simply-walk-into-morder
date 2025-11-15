@@ -38,9 +38,9 @@
       <% end %>
     </div>
 
-    <div class="bg-gray-900 text-white p-4" style="overflow-y: auto; overflow-x: hidden;">
+    <div class="bg-gray-900 text-white p-3" style="overflow-y: auto; overflow-x: hidden;">
       <% if logged_in? %>
-        <%= render 'user_stats', users: @users, current_user: @current_user %>
+        <%= render 'user_stats_mobile', users: @users, current_user: @current_user %>
       <% else %>
         <div class="flex items-center justify-center h-full">
           <p class="text-gray-400">Login to view stats</p>

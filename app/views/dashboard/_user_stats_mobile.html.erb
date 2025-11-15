@@ -1,0 +1,194 @@
+<!-- app/views/dashboard/_user_stats_mobile.html.erb -->
+<div class="space-y-3">
+  <!-- Header - Compact -->
+  <div class="border-b border-gray-700 pb-2">
+    <h2 class="text-lg font-bold text-yellow-500" style="font-family: 'Cinzel', serif;">
+      Fellowship Progress
+    </h2>
+    <p class="text-xs text-gray-400 italic">
+      <%= @active_path.name %>
+    </p>
+  </div>
+
+  <!-- Current User Section (Highlighted) - Compact -->
+  <div class="bg-yellow-900 bg-opacity-30 border-2 border-yellow-600 rounded-lg p-3">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full"
+             style="background-color: <%= current_user.token_color %>;"></div>
+        <h3 class="text-base font-bold text-white">
+          <%= current_user.name %> (You)
+        </h3>
+      </div>
+      <% if current_user.admin? %>
+        <span class="text-xs bg-yellow-600 text-stone-900 px-2 py-0.5 rounded font-bold">
+          ADMIN
+        </span>
+      <% end %>
+    </div>
+
+    <!-- Inline Step Form for Current User -->
+    <div class="space-y-2" data-controller="step-form" data-step-form-user-id="<%= current_user.id %>">
+      <!-- Stats Display - Compact -->
+      <div class="grid grid-cols-2 gap-3 text-xs mb-1">
+        <div class="bg-gray-900 bg-opacity-50 rounded p-2">
+          <p class="text-gray-400 text-xs mb-0.5">Total</p>
+          <p class="text-white font-bold text-sm">
+            <%= number_with_delimiter(current_user.step.total_steps) %>
+          </p>
+          <p class="text-gray-400 text-xs">
+            <%= current_user.step.total_miles %> mi
+          </p>
+        </div>
+
+        <div class="bg-gray-900 bg-opacity-50 rounded p-2">
+          <p class="text-gray-400 text-xs mb-0.5">Today</p>
+          <p class="text-white font-bold text-sm">
+            <%= number_with_delimiter(current_user.step.steps_today) %>
+          </p>
+          <p class="text-gray-400 text-xs">
+            <%= current_user.step.miles_today %> mi
+          </p>
+        </div>
+      </div>
+
+      <!-- Current Location - Compact -->
+      <div class="bg-gray-900 bg-opacity-50 rounded p-2 mb-1">
+        <p class="text-gray-400 text-xs mb-1">Current Location</p>
+        <% milestones = @active_path&.milestones || [] %>
+        <% user_miles = current_user.step.total_miles %>
+        <% prev_milestone = milestones.select { |m| m.cumulative_distance_miles <= user_miles }.last %>
+        <% upcoming_milestone = milestones.select { |m| m.cumulative_distance_miles > user_miles }.first || milestones.first %>
+
+        <% location_text =
+            if prev_milestone && upcoming_milestone && user_miles > prev_milestone.cumulative_distance_miles
+              "#{prev_milestone.name} → #{upcoming_milestone.name}"
+            elsif prev_milestone
+              prev_milestone.name
+            else
+              "The Shire"
+            end %>
+        <p class="text-yellow-400 font-semibold text-xs"><%= location_text %></p>
+
+        <% path_user = current_user.current_position_on_path(@active_path) %>
+        <div class="mt-1">
+          <div class="flex justify-between text-xs text-gray-400 mb-0.5">
+            <span>Progress</span>
+            <span><%= path_user&.progress_percentage.to_f.round(1) || 0 %>%</span>
+          </div>
+          <div class="w-full bg-gray-700 rounded-full h-1.5">
+            <div class="bg-yellow-600 h-1.5 rounded-full transition-all duration-500"
+                 style="width: <%= path_user&.progress_percentage || 0 %>%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Input Form - Compact -->
+      <% can_update = current_user.step.can_update_today? %>
+
+      <%= simple_form_for current_user.step,
+                          url: step_path(current_user.step),
+                          method: :patch,
+                          html: {
+                            data: {
+                              turbo: false,
+                              step_form_target: "form"
+                            }
+                          } do |f| %>
+
+        <div class="flex gap-3">
+          <%= number_field_tag :steps,
+              nil,
+              min: 1,
+              placeholder: "Add steps",
+              disabled: !can_update,
+              class: "flex-1 px-2 py-1.5 text-sm bg-gray-700 border #{can_update ? 'border-gray-600' : 'border-gray-800'} rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 #{!can_update ? 'opacity-50 cursor-not-allowed' : ''}" %>
+
+          <% if can_update %>
+            <%= f.button :submit,
+                "Update",
+                class: "px-3 py-1.5 text-sm bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+          <% else %>
+            <div class="px-3 py-1.5 text-sm bg-gray-700 text-gray-400 font-semibold rounded-md text-xs">
+              Updated
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Other Users - Compact -->
+  <% users.reject { |u| u.id == current_user.id }.each do |user| %>
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-2">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full"
+               style="background-color: <%= user.token_color %>;"></div>
+          <h3 class="text-sm font-semibold text-white">
+            <%= user.name %>
+          </h3>
+        </div>
+        <div class="text-xs text-gray-400">
+          <%= number_with_delimiter(user.step.total_steps) %> steps
+        </div>
+      </div>
+
+      <!-- Inline Step Form for Other Users -->
+      <div class="space-y-2" data-controller="step-form" data-step-form-user-id="<%= user.id %>">
+        <!-- Progress Bar Only -->
+        <% path_user = user.current_position_on_path(@active_path) %>
+        <div>
+          <div class="flex justify-between text-xs text-gray-400 mb-0.5">
+            <span>Progress</span>
+            <span><%= path_user&.progress_percentage.to_f.round(1) || 0 %>%</span>
+          </div>
+          <div class="w-full bg-gray-700 rounded-full h-1.5">
+            <div class="bg-yellow-600 h-1.5 rounded-full transition-all duration-500"
+                 style="width: <%= path_user&.progress_percentage || 0 %>%"></div>
+          </div>
+        </div>
+
+        <!-- Admin Update Form - Compact -->
+        <% if current_user.admin? %>
+          <% can_update = true %>
+
+          <%= simple_form_for user.step,
+                              url: admin_update_step_path(user.step),
+                              method: :patch,
+                              html: {
+                                data: {
+                                  turbo: false,
+                                  step_form_target: "form"
+                                }
+                              } do |f| %>
+
+            <%= hidden_field_tag :force, '1' %>
+
+            <div class="flex gap-2">
+              <%= number_field_tag :steps,
+                  nil,
+                  min: 1,
+                  placeholder: "Add steps",
+                  class: "flex-1 px-2 py-1.5 text-sm bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500" %>
+
+              <%= f.button :submit,
+                  "Update",
+                  class: "px-3 py-1.5 text-sm bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Logout Button - Compact -->
+  <div class="pt-2 border-t border-gray-700">
+    <%= button_to "Leave Fellowship",
+                  logout_path,
+                  method: :delete,
+                  class: "w-full py-1.5 px-3 text-sm bg-red-800 hover:bg-red-900 text-white font-semibold rounded-md transition-colors duration-200",
+                  data: { turbo: false } %>
+  </div>
+</div>
+
