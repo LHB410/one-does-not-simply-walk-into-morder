@@ -27,7 +27,7 @@
   </div>
 <% else %>
   <!-- Mobile: map on top, stats below -->
-  <div style="display: grid; grid-template-rows: 75vh 25vh; height: 100vh; overflow: hidden;">
+  <div style="display: grid; grid-template-rows: 50vh 50vh; height: 100vh; overflow: hidden;">
     <div class="relative bg-gradient-to-br from-amber-50 to-amber-100" style="overflow: hidden;">
       <% if logged_in? %>
         <%= render 'map', path: @active_path, users: @users, current_user: @current_user %>
