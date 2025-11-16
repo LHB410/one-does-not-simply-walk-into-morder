@@ -15,6 +15,20 @@ This app transforms your daily steps into progress along the epic journey from t
 - **Daily Step Logging**: Track your steps each day and see your progress toward the next milestone
 - **Progress Visualization**: See how far you and your friends have come on your journey
 
+## Table of Contents
+
+- [Technology Stack](#technology-stack)
+- [System Dependencies](#system-dependencies)
+- [Configuration](#configuration)
+- [Database Setup](#database-setup)
+- [Running the Application](#running-the-application)
+- [How It Works](#how-it-works)
+- [Testing](#testing)
+- [Services](#services)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Technology Stack
 
 - **Ruby**: 3.4.4
@@ -68,11 +82,6 @@ The seed file creates:
 ### Development
 
 Start the Rails server:
-```bash
-bin/dev
-```
-
-Or manually:
 ```bash
 rails server
 ```
@@ -132,16 +141,6 @@ The app uses RSpec for testing with FactoryBot for test data and Shoulda Matcher
 - **Daily Step Update Job**: If Google Sheets is configured, automatically fetches step data from a Google Sheet (which users must manually update) and updates user progress (runs via Clockwork at 11:59 PM CST daily)
 - **Google Sheets Service**: Optional integration that retrieves daily step counts from a Google Sheet. Users must manually update the Google Sheet with their step counts - the service only reads from it, it does not write to it.
 
-## Deployment
-
-The application is deployed to Heroku via GitHub integration. Pushes to the main branch automatically trigger deployments. Ensure all required environment variables are configured in Heroku's dashboard, including:
-
-- Database URL (automatically provided by Heroku Postgres addon)
-- Google Sheets API credentials (optional - only needed if using Google Sheets for step updates)
-- Any other required API keys or configuration
-
-The Clockwork scheduler runs as a separate process on Heroku using a worker dyno.
-
 ## Project Structure
 
 - `app/models/`: Core models (User, Path, Step, Milestone, PathUser)
@@ -153,7 +152,31 @@ The Clockwork scheduler runs as a separate process on Heroku using a worker dyno
 
 ## Contributing
 
-This is a personal project for friends to track their fitness journey together. Feel free to fork and adapt for your own group!
+This is a personal project for friends to track their fitness journey together. We welcome contributions from anyone who wants to help improve the app!
+
+### How to Contribute
+
+1. **Fork the repository** and clone it to your local machine
+2. **Create a new branch** for your feature or bug fix:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. **Make your changes** and ensure tests pass:
+   ```bash
+   bundle exec rspec
+   ```
+4. **Commit your changes** with clear, descriptive commit messages
+5. **Push to your fork** and open a Pull Request
+
+### What We're Looking For
+
+- Bug fixes and improvements
+- New features that enhance the user experience
+- Documentation improvements
+- Performance optimizations
+- Test coverage improvements
+
+Feel free to fork and adapt this project for your own group, or submit PRs to help make it better for everyone!
 
 ## License
 
