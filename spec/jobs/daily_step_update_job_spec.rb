@@ -24,6 +24,7 @@ RSpec.describe DailyStepUpdateJob, type: :job do
   describe "#perform" do
     before do
       allow_any_instance_of(User).to receive(:total_miles).and_return(2)
+      allow(Path).to receive(:current).and_return(active_path)
     end
     it "fetches data from Google Sheets" do
       expect(sheets_service).to receive(:fetch_user_steps_rows)
@@ -58,8 +59,8 @@ RSpec.describe DailyStepUpdateJob, type: :job do
     it "updates path progress for all users" do
       described_class.perform_now
 
-      expect(path_user1.reload.progress_percentage).to be > 0
-      expect(path_user2.reload.progress_percentage).to be > 0
+      expect(path_user1.reload.progress_percentage).to be > 0.0
+      expect(path_user2.reload.progress_percentage).to be > 0.0
     end
 
     it "sets last_updated_date to current date" do

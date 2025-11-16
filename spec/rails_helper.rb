@@ -75,6 +75,11 @@ RSpec.configure do |config|
   # Shared contexts
   config.include_context "authenticated user", type: :controller, authenticated: true
   config.include_context "authenticated admin", type: :controller, admin: true
+
+  # Clear Path.current cache before each test to avoid memoization issues
+  config.before(:each) do
+    Path.clear_current_cache!
+  end
 end
 
 Shoulda::Matchers.configure do |config|
