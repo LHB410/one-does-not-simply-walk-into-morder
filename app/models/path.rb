@@ -7,7 +7,20 @@ class Path < ApplicationRecord
   validates :part_number, inclusion: { in: [ 1, 2 ] }
 
   scope :active, -> { where(active: true) }
-  scope :part_one, -> { where(part_number: 1) }
+
+  # Memoized class method to get the current active path
+  # Since there's only one active path that never changes, this caches the result
+  # to avoid repeated database queries throughout the application
+  def self.current
+    return @current_path if defined?(@current_path)
+
+    @current_path = active.includes(:milestones).first
+  end
+
+  # Clear the cached current path (useful for testing)
+  def self.clear_current_cache!
+    @current_path = nil
+  end
 
   def total_distance_miles_to_steps
     total_distance_miles * Step::STEPS_PER_MILE
@@ -17,24 +30,29 @@ class Path < ApplicationRecord
     milestones.where("sequence_order > ?", current_milestone.sequence_order).first
   end
 
-  def remaining_distance_from_milestone(milestone, current_user_miles)
-    total_distance_miles - current_user_miles
-  end
-
   def milestone_for_distance(miles)
     miles_int = miles.to_f.floor
-    ordered = milestones.reorder(nil)
 
-    reached = ordered
+    # Remove default sequence_order and order by cumulative_distance_miles instead
+    # This is more efficient than ordering by both sequence_order and cumulative_distance_miles
+    base_relation = milestones.unscope(:order)
+
+    # Find the highest milestone where cumulative_distance_miles <= miles_int
+    reached = base_relation
       .where("cumulative_distance_miles <= ?", miles_int)
       .order(cumulative_distance_miles: :desc)
       .first
 
-    reached || ordered.order(cumulative_distance_miles: :asc).first
+    # Fallback to first milestone if none reached (shouldn't happen, but safe)
+    reached || base_relation.order(cumulative_distance_miles: :asc).first
   end
 
 
   def all_users_completed?
-    path_users.all? { |pu| pu.progress_percentage >= 100.0 }
+    return @all_users_completed if defined?(@all_users_completed)
+
+    # Use SQL aggregation instead of loading all records into memory
+    # Returns true if no path_users have progress < 100%
+    @all_users_completed = !path_users.where("progress_percentage < 100").exists?
   end
 end

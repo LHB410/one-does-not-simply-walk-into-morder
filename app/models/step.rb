@@ -39,7 +39,7 @@ class Step < ApplicationRecord
   private
 
   def recalculate_distances
-  active_path = Path.active.first
+  active_path = Path.current
   return unless active_path
   current_miles = total_steps / STEPS_PER_MILE.to_f
 

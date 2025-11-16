@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
-  resources :steps, only: [ :index, :update ] do
+  resources :steps, only: [ :update ] do
     member do
       patch :admin_update
     end
