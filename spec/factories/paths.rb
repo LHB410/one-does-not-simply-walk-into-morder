@@ -8,11 +8,5 @@ FactoryBot.define do
     trait :active do
       active { true }
     end
-
-    trait :part_two do
-      name { "Journey to Grey Havens" }
-      part_number { 2 }
-      total_distance_miles { 200 }
-    end
   end
 end
