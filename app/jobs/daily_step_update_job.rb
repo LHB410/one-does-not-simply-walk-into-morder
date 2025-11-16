@@ -70,12 +70,6 @@ class DailyStepUpdateJob < ApplicationJob
       end
     end
 
-    # Check if we need to transition to Part 2
-    active_path = Path.active.first
-    if active_path&.all_users_completed? && active_path.part_number == 1
-      PathTransitionService.new(active_path).transition_to_part_two
-    end
-
     Rails.logger.info("Daily step update completed: updated=#{updated_count}, skipped_no_data=#{skipped_no_data}, skipped_already_today=#{skipped_already_today}")
   end
 end

@@ -98,22 +98,5 @@ RSpec.describe DailyStepUpdateJob, type: :job do
         described_class.perform_now
       end
     end
-
-    context "when all users complete part 1" do
-      let!(:part_two) { create(:path, :part_two) }
-
-      before do
-        path_user1.update(progress_percentage: 100.0)
-        path_user2.update(progress_percentage: 100.0)
-        allow_any_instance_of(Path).to receive(:all_users_completed?).and_return(true)
-      end
-
-      it "transitions to part 2" do
-        described_class.perform_now
-
-        expect(active_path.reload.active).to be false
-        expect(part_two.reload.active).to be true
-      end
-    end
   end
 end

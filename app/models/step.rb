@@ -56,7 +56,7 @@ class Step < ApplicationRecord
       distance_to_next = next_milestone.cumulative_distance_miles - current_miles
       self.steps_until_next_milestone = (distance_to_next * STEPS_PER_MILE).to_i
     else
-      self.steps_until_next_milestone = 0 # No more milestones, i.e., Mordor reached
+      self.steps_until_next_milestone = 0 # No more milestones, journey complete
     end
   end
   end
