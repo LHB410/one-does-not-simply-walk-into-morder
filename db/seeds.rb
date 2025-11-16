@@ -16,54 +16,35 @@ Path.destroy_all
 
 puts "Creating paths..."
 
-# Part 1: Journey to Mordor
-part_one = Path.create!(
-  name: "Journey to Mordor",
+# Single continuous journey: Shire to Grey Havens
+journey = Path.create!(
+  name: "Journey to Mordor and Back",
   part_number: 1,
-  total_distance_miles: 1350, # Approximate total for Part 1
+  total_distance_miles: 3659,
   active: true
 )
 
-# Part 1 Milestones with distances
-milestones_part_one = [
+# All milestones with cumulative distances from Shire
+milestones = [
+  # Journey to Mordor
   { name: "Shire", distance: 0, cumulative: 0, x: 21.10, y: 27.42 },
   { name: "Rivendell", distance: 458, cumulative: 458, x: 47.73, y: 26.82 },
-  { name: "Moria", distance: 200, cumulative: 658, x: 45.96, y: 38.66 },
-  { name: "Lothlórien", distance: 112, cumulative: 770, x: 52.66, y: 41.22 },
-  { name: "Falls of Rauros", distance: 389, cumulative: 1159, x: 62.52, y: 61.54 },
-  { name: "Dead Marshes", distance: 90, cumulative: 1249, x: 66.47, y: 60.55 },
-  { name: "Shelob's Lair", distance: 80, cumulative: 1329, x: 73.18, y: 68.44 },
-  { name: "Mount Doom", distance: 21, cumulative: 1350, x: 77.71, y: 65.68 }
+  { name: "Moria", distance: 175, cumulative: 633, x: 45.96, y: 38.66 },
+  { name: "Lothlórien", distance: 122, cumulative: 755, x: 52.66, y: 41.22 },
+  { name: "Falls of Rauros", distance: 389, cumulative: 1144, x: 62.52, y: 61.54 },
+  { name: "Dead Marshes", distance: 102, cumulative: 1246, x: 66.47, y: 60.55 },
+  { name: "Shelob's Lair", distance: 189, cumulative: 1435, x: 73.18, y: 68.44 },
+  { name: "Mount Doom", distance: 179, cumulative: 1614, x: 77.71, y: 65.68 },
+  # Return journey
+  { name: "Minas Tirith", distance: 160, cumulative: 1774, x: 68.49, y: 70.49 },
+  { name: "Isengard", distance: 535, cumulative: 2309, x: 41.97, y: 53.92 },
+  { name: "Hobbiton", distance: 1090, cumulative: 3399, x: 17.56, y: 27.81 },
+  { name: "Grey Havens", distance: 260, cumulative: 3659, x: 6.42, y: 26.795 }
 ]
 
-milestones_part_one.each_with_index do |milestone_data, index|
+milestones.each_with_index do |milestone_data, index|
   Milestone.create!(
-    path: part_one,
-    name: milestone_data[:name],
-    distance_from_previous_miles: milestone_data[:distance],
-    cumulative_distance_miles: milestone_data[:cumulative],
-    sequence_order: index,
-    map_position_x: milestone_data[:x],
-    map_position_y: milestone_data[:y]
-  )
-end
-
-# Part 2: Grey Havens
-part_two = Path.create!(
-  name: "Journey to Grey Havens",
-  part_number: 2,
-  total_distance_miles: 200, # Shire to Grey Havens
-  active: false
-)
-
-milestones_part_two = [
-  { name: "Shire", distance: 0, cumulative: 0, x: 21.10, y: 27.42 },
-  { name: "Grey Havens", distance: 200, cumulative: 200, x: 7.10, y: 24.65 }
-]
-
-milestones_part_two.each_with_index do |milestone_data, index|
-  Milestone.create!(
-    path: part_two,
+    path: journey,
     name: milestone_data[:name],
     distance_from_previous_miles: milestone_data[:distance],
     cumulative_distance_miles: milestone_data[:cumulative],
@@ -95,8 +76,8 @@ users_data.each do |user_data|
   # Create path association
   PathUser.create!(
     user: user,
-    path: part_one,
-    current_milestone: part_one.milestones.first,
+    path: journey,
+    current_milestone: journey.milestones.first,
     progress_percentage: 0.0
   )
 

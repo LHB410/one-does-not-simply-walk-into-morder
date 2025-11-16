@@ -8,7 +8,6 @@ class Path < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :part_one, -> { where(part_number: 1) }
-  scope :part_two, -> { where(part_number: 2) }
 
   def total_distance_miles_to_steps
     total_distance_miles * Step::STEPS_PER_MILE

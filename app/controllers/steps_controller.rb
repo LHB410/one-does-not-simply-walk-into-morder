@@ -84,17 +84,6 @@ class StepsController < ApplicationController
     active_path = Path.active.first
     path_user = current_user.current_position_on_path(active_path)
     path_user&.update_progress
-
-    check_path_completion(active_path)
-  end
-
-  def check_path_completion(path)
-    return unless path.all_users_completed?
-
-    if path.part_number == 1
-      # Activate Part 2 and reset user positions
-      PathTransitionService.new(path).transition_to_part_two
-    end
   end
 
   def step_json(step)
