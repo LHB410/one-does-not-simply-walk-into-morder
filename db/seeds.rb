@@ -57,18 +57,18 @@ end
 puts "Creating users..."
 
 users_data = [
-  { name: "Laura", email: "laura.brooks0@outlook.com", admin: true, color: "#4169E1" },
-  { name: "Sonja", email: "sonjaschmidt23@gmail.com", admin: false, color: "#FFD700" },
-  { name: "Mellisa", email: "magoodway@gmail.com", admin: false, color: "#32CD32" },
-  { name: "Megan", email: "fullmetal.migliushka@gmail.com", admin: false, color: "#FF6347" }
+  { name: "Frodo", email: "frodo@test.com", admin: true, color: "#4169E1" },
+  { name: "Sam", email: "sam@test.com", admin: false, color: "#FFD700" },
+  { name: "Pippin", email: "pippin@test.com", admin: false, color: "#32CD32" },
+  { name: "Merry", email: "merry@test.com", admin: false, color: "#FF6347" }
 ]
 
 users_data.each do |user_data|
   user = User.create!(
     name: user_data[:name],
     email: user_data[:email],
-    password: "iCanCarryYou!11",
-    password_confirmation: "iCanCarryYou!11",
+    password: "pass123",
+    password_confirmation: "pass123",
     admin: user_data[:admin],
     token_color: user_data[:color]
   )
@@ -85,5 +85,5 @@ users_data.each do |user_data|
 end
 
 puts "Seed complete!"
-puts "Login with any user email and password: iCanCarryYou!11"
-puts "Admin user: laura.brooks0@outlook.com"
+puts "Login with any user email and password: pass123"
+puts "Admin user: frodo@test.com"
