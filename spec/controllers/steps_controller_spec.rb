@@ -20,13 +20,15 @@ RSpec.describe StepsController, type: :controller do
       it "returns success response" do
         patch :update, params: { id: step.id, steps: 5000 }, format: :json
 
-        expect(response).to have_http_status(:see_other)
-        expect(response).to redirect_to(root_path)
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json['success']).to be true
       end
 
       it "updates path progress" do
         allow_any_instance_of(User).to receive(:total_miles).and_return(400)
-        allow_any_instance_of(Path).to receive(:milestone_for_distance).and_return(rivendell)
+        allow(Path).to receive(:current).and_return(active_path)
+        allow(active_path).to receive(:milestone_for_distance).and_return(rivendell)
         patch :update, params: { id: step.id, steps: 844_800 }, format: :json
         path_user.reload
         expect(path_user.current_milestone).to eq(rivendell)

@@ -28,8 +28,7 @@
     <p class="text-gray-400 text-xs mb-1">Current Location</p>
     <% milestones = @active_path&.milestones || [] %>
     <% user_miles = user.step.total_miles %>
-    <% prev_milestone = milestones.select { |m| m.cumulative_distance_miles <= user_miles }.last %>
-    <% upcoming_milestone = milestones.select { |m| m.cumulative_distance_miles > user_miles }.first || milestones.first %> <!-- Fallback to first milestone if none found -->
+    <% prev_milestone, upcoming_milestone = find_milestones_for_user(milestones, user_miles) %>
 
     <% location_text =
         if prev_milestone && upcoming_milestone && user_miles > prev_milestone.cumulative_distance_miles
@@ -91,7 +90,7 @@
         min: 1,
         placeholder: "Enter steps",
         disabled: !can_update,
-        class: "w-full px-3 py-2 bg-gray-700 border #{can_update ? 'border-gray-600' : 'border-gray-800'} rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 #{!can_update ? 'opacity-50 cursor-not-allowed' : ''}" %>
+        class: "w-full mb-2 px-3 py-2 bg-gray-700 border #{can_update ? 'border-gray-600' : 'border-gray-800'} rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 #{!can_update ? 'opacity-50 cursor-not-allowed' : ''}" %>
 
     <% if can_update %>
       <%= f.button :submit,

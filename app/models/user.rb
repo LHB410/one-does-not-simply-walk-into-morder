@@ -11,14 +11,13 @@ class User < ApplicationRecord
 
   after_create :create_associated_step
 
-  scope :non_admin, -> { where(admin: false) }
-  scope :admin_users, -> { where(admin: true) }
-
   def total_miles
-    (step.total_steps * 0.0004735).round(2) # ~2,112 steps per mile average
+    (step.total_steps / Step::STEPS_PER_MILE.to_f).round(2)
   end
 
   def current_position_on_path(path)
+    return nil unless path
+    return path_users.detect { |pu| pu.path_id == path.id } if path_users.loaded?
     path_users.find_by(path: path)
   end
 
@@ -32,11 +31,11 @@ class User < ApplicationRecord
   end
 
   def calculate_initial_steps_to_mordor
-    Path.active.first&.total_distance_miles_to_steps || 0
+    Path.current&.total_distance_miles_to_steps || 0
   end
 
   def calculate_initial_steps_to_next_milestone
-    path = Path.active.first
+    path = Path.current
     return 0 unless path
 
     # From the starting point (0 miles) the "next milestone" is the second one in order.

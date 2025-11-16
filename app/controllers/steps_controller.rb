@@ -1,12 +1,6 @@
 class StepsController < ApplicationController
   before_action :require_login
 
-  def index
-    @users = User.includes(:step, path_users: [ :path, :current_milestone ]).all
-    @active_path = Path.active.includes(:milestones).first
-    @current_user_step = current_user.step
-  end
-
   def update
     @step = current_user.step
 
@@ -57,7 +51,7 @@ class StepsController < ApplicationController
 
     if @step.add_steps(steps_to_add, force: true)
       user = @step.user
-      user.current_position_on_path(Path.active.first)&.update_progress
+      user.current_position_on_path(Path.current)&.update_progress
 
       respond_to do |format|
         format.html { redirect_to root_path, notice: "Steps updated successfully!" }
@@ -81,7 +75,7 @@ class StepsController < ApplicationController
   private
 
   def update_user_path_progress
-    active_path = Path.active.first
+    active_path = Path.current
     path_user = current_user.current_position_on_path(active_path)
     path_user&.update_progress
   end

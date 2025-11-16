@@ -45,7 +45,10 @@ class DailyStepUpdateJob < ApplicationJob
     skipped_no_data = 0
     skipped_already_today = 0
 
-    User.find_each do |user|
+    # Fetch active path once before the loop (memoized via Path.current)
+    active_path = Path.current
+
+    User.includes(:step, path_users: :path).find_each do |user|
       next unless steps_data.key?(user.email.downcase)
 
       step = user.step
@@ -59,7 +62,6 @@ class DailyStepUpdateJob < ApplicationJob
 
       if step.add_steps(new_steps)
         # Update path progress
-        active_path = Path.active.first
         path_user = user.current_position_on_path(active_path)
         path_user&.update_progress
 

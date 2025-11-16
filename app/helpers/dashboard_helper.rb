@@ -41,4 +41,15 @@ module DashboardHelper
     { x: current_milestone.map_position_x, y: current_milestone.map_position_y }
   end
   end
+
+  # Efficiently find previous and upcoming milestones for a user's current position
+  # Returns [prev_milestone, upcoming_milestone] in a single pass
+  def find_milestones_for_user(milestones, user_miles)
+    return [ nil, milestones.first ] if milestones.empty?
+
+    # Partition milestones in a single pass: [reached, upcoming]
+    reached, upcoming = milestones.partition { |m| m.cumulative_distance_miles <= user_miles }
+
+    [ reached.last, upcoming.first || milestones.first ]
+  end
 end

@@ -10,6 +10,14 @@ RSpec.describe GoogleSheetsService do
   let(:mock_response) { double(values: fixture_values) }
 
   before do
+    # Stub ENV before service initialization to avoid constant evaluation errors
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch).with("GOOGLE_SHEET_ID", anything).and_return("test-sheet-id")
+    allow(ENV).to receive(:fetch).with("GOOGLE_SHEETS_WEBAPP_URL", anything).and_return("")
+    allow(ENV).to receive(:[]).with("GOOGLE_SHEETS_WEBAPP_URL").and_return(nil)
+    allow(ENV).to receive(:[]).with("GOOGLE_SERVICE_ACCOUNT_JSON").and_return('{"type":"service_account"}')
+    # Stub the constant after class load to override the evaluated value
+    stub_const("GoogleSheetsService::WEBAPP_URL", "")
     allow(Google::Apis::SheetsV4::SheetsService).to receive(:new).and_return(mock_service)
     allow(mock_service).to receive(:authorization=)
     allow_any_instance_of(described_class).to receive(:authorize).and_return(double)

@@ -57,8 +57,7 @@
         <p class="text-gray-400 text-xs mb-1">Current Location</p>
         <% milestones = @active_path&.milestones || [] %>
         <% user_miles = current_user.step.total_miles %>
-        <% prev_milestone = milestones.select { |m| m.cumulative_distance_miles <= user_miles }.last %>
-        <% upcoming_milestone = milestones.select { |m| m.cumulative_distance_miles > user_miles }.first || milestones.first %>
+        <% prev_milestone, upcoming_milestone = find_milestones_for_user(milestones, user_miles) %>
 
         <% location_text =
             if prev_milestone && upcoming_milestone && user_miles > prev_milestone.cumulative_distance_miles
