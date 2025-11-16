@@ -2,7 +2,7 @@
 class DashboardController < ApplicationController
   def index
     if logged_in?
-      @users = User.includes(:step, path_users: [ :current_milestone ]).all
+      @users = User.includes(:step, path_users: [ :current_milestone, :path ]).all
       @active_path = Path.active.includes(milestones: []).first
       @current_user = current_user
     else

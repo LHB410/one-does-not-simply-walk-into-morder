@@ -19,6 +19,7 @@ class User < ApplicationRecord
   end
 
   def current_position_on_path(path)
+    return path_users.detect { |pu| pu.path_id == path.id } if path_users.loaded?
     path_users.find_by(path: path)
   end
 
