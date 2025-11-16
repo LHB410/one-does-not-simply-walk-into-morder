@@ -57,19 +57,13 @@
   <!-- Next Milestone Info -->
   <div class="bg-gray-900 bg-opacity-50 rounded p-3">
     <p class="text-gray-400 text-xs mb-1">Until Next Milestone</p>
-    <% next_miles_remaining =
-         if upcoming_milestone
-           remaining = upcoming_milestone.cumulative_distance_miles - user_miles
-           remaining.negative? ? 0 : remaining
-         else
-           0
-         end %>
-    <% next_steps_remaining = (next_miles_remaining * Step::STEPS_PER_MILE).to_i %>
+    <%# Use the database-calculated value from step.steps_until_next_milestone
+        which correctly handles milestone progression and step carryover %>
     <p class="text-white font-bold">
-      <%= number_with_delimiter(next_steps_remaining) %> steps
+      <%= number_with_delimiter(step.steps_until_next_milestone) %> steps
     </p>
     <p class="text-gray-400 text-xs">
-      <%= next_miles_remaining.round(2) %> miles
+      <%= step.miles_until_next_milestone %> miles
     </p>
   </div>
 
