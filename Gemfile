@@ -25,8 +25,6 @@ gem "bcrypt", "~> 3.1.7"
 # Background jobs
 gem "sidekiq", "~> 7.0"
 
-# Scheduled jobs
-gem "clockwork", "~> 3.0"
 
 
 gem "simple_form", "~> 5.0"
