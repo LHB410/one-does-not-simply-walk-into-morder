@@ -28,8 +28,7 @@ gem "sidekiq", "~> 7.0"
 # Scheduled jobs
 gem "clockwork", "~> 3.0"
 
-# Google Sheets API
-gem "google-api-client", "~> 0.53"
+
 gem "simple_form", "~> 5.0"
 gem "tailwindcss-rails"
 
