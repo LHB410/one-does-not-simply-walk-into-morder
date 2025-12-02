@@ -1,6 +1,29 @@
 class StepsController < ApplicationController
   before_action :require_login
 
+  def report
+    @active_path = Path.current
+    per_page = 10
+    @page = params[:page].to_i
+    @page = 1 if @page < 1
+
+    if @active_path
+      total_days = DailyStepEntry.total_days_for(user: current_user, path: @active_path)
+      @total_pages = (total_days / per_page.to_f).ceil
+      @total_pages = 1 if @total_pages.zero?
+
+      @daily_rows = DailyStepEntry.daily_totals_for(
+        user: current_user,
+        path: @active_path,
+        page: @page,
+        per_page: per_page
+      )
+    else
+      @total_pages = 1
+      @daily_rows = DailyStepEntry.none
+    end
+  end
+
   def update
     @step = current_user.step
 

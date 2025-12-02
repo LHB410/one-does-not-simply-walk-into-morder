@@ -1,0 +1,86 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="daily-steps-report-title">
+  <div class="bg-gray-900 text-white rounded-lg shadow-2xl max-w-2xl max-h-[80vh] flex-col border border-yellow-700 pointer-events-auto mx-4 w-auto">
+    <div class="flex items-center justify-center px-6 py-4 border-b border-gray-800">
+      <h2 id="daily-steps-report-title"
+          class="text-xl font-bold text-yellow-500 text-center"
+          style="font-family: 'Cinzel', serif;">
+        Daily Step Report
+      </h2>
+      <button type="button"
+              class="w-6 text-right text-gray-400 hover:text-white rounded-full p-3"
+              aria-label="Close daily step report"
+              onclick="document.getElementById('daily-steps-report').innerHTML='';">
+        ✕
+      </button>
+    </div>
+
+    <div class="px-6 py-4 overflow-y-auto">
+      <% if daily_rows.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-700 text-sm">
+            <thead class="bg-gray-800">
+              <tr>
+                <th scope="col" class="px-3 py-2 text-left font-semibold text-gray-300">
+                  Date
+                </th>
+                <th scope="col" class="px-3 py-2 text-right font-semibold text-gray-300">
+                  Steps Input
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+              <% daily_rows.each do |row| %>
+                <tr>
+                  <td class="px-3 py-2">
+                    <%= row.date.strftime("%b %-d, %Y") %>
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    <%= number_with_delimiter(row.try(:total_steps) || row.steps) %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-400">
+          No daily step entries yet. Once you start logging steps, they will appear here.
+        </p>
+      <% end %>
+    </div>
+
+    <div class="flex items-center justify-between p-3 border-t border-gray-800 text-xs text-gray-300">
+      <div>
+        Page <%= page %> of <%= total_pages %>
+      </div>
+      <div class="flex items-center gap-2">
+        <% if page > 1 %>
+          <%= link_to "Previous",
+                      steps_report_path(page: page - 1),
+                      data: { turbo_frame: "daily-steps-report" },
+                      class: "px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-200" %>
+        <% else %>
+          <span class="px-2 py-1 rounded bg-gray-900 text-gray-600 cursor-not-allowed">
+            Previous
+          </span>
+        <% end %>
+
+        <% if page < total_pages %>
+          <%= link_to "Next",
+                      steps_report_path(page: page + 1),
+                      data: { turbo_frame: "daily-steps-report" },
+                      class: "px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-200" %>
+        <% else %>
+          <span class="px-2 py-1 rounded bg-gray-900 text-gray-600 cursor-not-allowed">
+            Next
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
