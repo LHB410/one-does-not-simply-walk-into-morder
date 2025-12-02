@@ -33,7 +33,18 @@ class Step < ApplicationRecord
     self.last_updated_date = Date.current
 
     recalculate_distances
-    save
+    if save
+      active_path = Path.current
+      DailyStepEntry.record!(
+        user: user,
+        path: active_path,
+        date: Date.current,
+        steps: new_steps
+      ) if active_path
+      true
+    else
+      false
+    end
   end
 
   private

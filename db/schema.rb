@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_10_045114) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_02_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "daily_step_entries", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "path_id", null: false
+    t.date "date", null: false
+    t.integer "steps", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["path_id"], name: "index_daily_step_entries_on_path_id"
+    t.index ["user_id", "path_id", "date"], name: "index_daily_step_entries_on_user_path_date", unique: true
+    t.index ["user_id"], name: "index_daily_step_entries_on_user_id"
+  end
 
   create_table "milestones", force: :cascade do |t|
     t.bigint "path_id", null: false
@@ -72,6 +84,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_10_045114) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "daily_step_entries", "paths"
+  add_foreign_key "daily_step_entries", "users"
   add_foreign_key "milestones", "paths"
   add_foreign_key "path_users", "paths"
   add_foreign_key "path_users", "users"

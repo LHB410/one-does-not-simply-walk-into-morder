@@ -1,10 +1,28 @@
 require 'rails_helper'
 
 RSpec.describe StepsController, type: :controller do
+  render_views
+
   include_context "authenticated user"
   include_context "user with path progress"
 
   let(:step) { user.step }
+
+  describe "GET #report" do
+    it "returns success and renders the daily report partial" do
+      allow(Path).to receive(:current).and_return(active_path)
+
+      DailyStepEntry.record!(user: user, path: active_path, date: Date.current, steps: 1234)
+
+      get :report
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template("steps/report")
+      expect(response).to render_template(partial: "steps/_daily_report")
+      expect(response.body).to include("Daily Step Report")
+      expect(response.body).to include("1,234")
+    end
+  end
 
   describe "PATCH #update" do
     context "when can update today" do
