@@ -26,7 +26,8 @@ class DailyStepEntry < ApplicationRecord
     relation = for_user_on_path(user, path)
 
     # If there are no entries yet, just return an empty relation
-    min_date, max_date = relation.pick(Arel.sql("MIN(date)"), Arel.sql("MAX(date)"))
+    min_date = relation.minimum(:date)
+    max_date = relation.maximum(:date)
     return relation.none unless min_date && max_date
 
     # Always show up to today, even if there haven't been entries for a while
@@ -53,7 +54,8 @@ class DailyStepEntry < ApplicationRecord
 
   def self.total_days_for(user:, path:)
     relation = for_user_on_path(user, path)
-    min_date, max_date = relation.pick(Arel.sql("MIN(date)"), Arel.sql("MAX(date)"))
+    min_date = relation.minimum(:date)
+    max_date = relation.maximum(:date)
     return 0 unless min_date && max_date
 
     # Count every calendar day in the range, not just days with entries

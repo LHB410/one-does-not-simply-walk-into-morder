@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe StepsController, type: :controller do
+  render_views
+
   include_context "authenticated user"
   include_context "user with path progress"
 
@@ -8,6 +10,8 @@ RSpec.describe StepsController, type: :controller do
 
   describe "GET #report" do
     it "returns success and renders the daily report partial" do
+      allow(Path).to receive(:current).and_return(active_path)
+
       DailyStepEntry.record!(user: user, path: active_path, date: Date.current, steps: 1234)
 
       get :report
