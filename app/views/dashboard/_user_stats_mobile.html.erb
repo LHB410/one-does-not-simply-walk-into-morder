@@ -12,8 +12,8 @@
 
   <!-- Current User Section (Highlighted) - Compact -->
   <div class="bg-yellow-900 bg-opacity-30 border-2 border-yellow-600 rounded-lg p-3">
-    <div class="flex items-center justify-between mb-2">
-      <div class="flex flex-col gap-1">
+    <div class="flex items-center mb-2">
+      <div class="flex flex-col gap-3">
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 rounded-full"
                style="background-color: <%= current_user.token_color %>;"></div>
@@ -30,7 +30,7 @@
           <%= link_to "Daily Step Report",
                       steps_report_path,
                       data: { turbo_frame: "daily-steps-report" },
-                      class: "inline-flex items-center text-[11px] px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-yellow-400 border border-yellow-600 transition-colors duration-200" %>
+                      class: "inline-flex items-center text-[11px] px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 text-yellow-400 border border-yellow-600 transition-colors duration-200" %>
         </div>
       </div>
     </div>
