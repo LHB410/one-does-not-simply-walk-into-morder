@@ -33,44 +33,47 @@ class Step < ApplicationRecord
     self.last_updated_date = Date.current
 
     recalculate_distances
-    if save
+
+    transaction do
+      save!
       active_path = Path.current
-      DailyStepEntry.record!(
-        user: user,
-        path: active_path,
-        date: Date.current,
-        steps: new_steps
-      ) if active_path
-      true
-    else
-      false
+      if active_path
+        DailyStepEntry.record!(
+          user: user,
+          path: active_path,
+          date: Date.current,
+          steps: new_steps
+        )
+      end
     end
+    true
+  rescue ActiveRecord::ActiveRecordError => e
+    Rails.logger.error("Failed to add steps: #{e.class} - #{e.message}")
+    false
   end
 
   private
 
   def recalculate_distances
-  active_path = Path.current
-  return unless active_path
-  current_miles = total_steps / STEPS_PER_MILE.to_f
+    active_path = Path.current
+    return unless active_path
+    current_miles = total_steps / STEPS_PER_MILE.to_f
 
-  # Calculate current milestone based on updated miles, not stale path_user.current_milestone
-  # This ensures that when steps carry over past a milestone, we use the correct current milestone
-  current_milestone = active_path.milestone_for_distance(current_miles)
+    # Calculate current milestone based on updated miles, not stale path_user.current_milestone
+    # This ensures that when steps carry over past a milestone, we use the correct current milestone
+    current_milestone = active_path.milestone_for_distance(current_miles)
 
-  if current_milestone
-    # Calculate remaining distance to Mordor from current position
-    remaining_distance = active_path.total_distance_miles - current_miles
-    self.steps_until_mordor = (remaining_distance * STEPS_PER_MILE).to_i
+    if current_milestone
+      remaining_distance = active_path.total_distance_miles - current_miles
+      self.steps_until_mordor = [ remaining_distance * STEPS_PER_MILE, 0 ].max.to_i
 
-    # Find the next milestone after the current one
-    next_milestone = active_path.next_milestone_after(current_milestone)
-    if next_milestone
-      distance_to_next = next_milestone.cumulative_distance_miles - current_miles
-      self.steps_until_next_milestone = [ distance_to_next * STEPS_PER_MILE, 0 ].max.to_i
-    else
-      self.steps_until_next_milestone = 0 # No more milestones, journey complete
+      next_milestone = active_path.next_milestone_after(current_milestone)
+      if next_milestone
+        distance_to_next = next_milestone.cumulative_distance_miles - current_miles
+        self.steps_until_next_milestone = [ distance_to_next * STEPS_PER_MILE, 0 ].max.to_i
+      else
+        self.steps_until_next_milestone = 0
+      end
     end
-  end
   end
 end

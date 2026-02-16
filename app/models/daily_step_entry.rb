@@ -15,8 +15,6 @@ class DailyStepEntry < ApplicationRecord
     entry = find_or_initialize_by(user: user, path: path, date: date)
     entry.steps = entry.steps.to_i + steps.to_i
     entry.save!
-  rescue ActiveRecord::ActiveRecordError => e
-    Rails.logger.error("Failed to record DailyStepEntry: #{e.class} - #{e.message}")
   end
 
   def self.daily_totals_for(user:, path:, page:, per_page:)
@@ -25,29 +23,29 @@ class DailyStepEntry < ApplicationRecord
 
     relation = for_user_on_path(user, path)
 
-    # If there are no entries yet, just return an empty relation
     min_date = relation.minimum(:date)
     max_date = relation.maximum(:date)
     return relation.none unless min_date && max_date
 
-    # Always show up to today, even if there haven't been entries for a while
     last_date = [ max_date, Date.current ].max
 
-    # Build a continuous list of dates from the first entry to the last (or today),
-    # then paginate over that list of days
-    all_dates_desc = (min_date..last_date).to_a.sort.reverse
+    # Calculate the page window arithmetically instead of building a full date array.
+    # Dates are in descending order, so page 1 starts from last_date.
     offset = (page - 1) * per_page
-    paginated_dates = all_dates_desc.slice(offset, per_page) || []
+    page_end_date = last_date - offset
+    page_start_date = [ last_date - offset - per_page + 1, min_date ].max
 
-    # Preload actual totals for days that have data
+    return [] if page_end_date < min_date
+
+    # Only query entries within the current page's date range
     totals_by_date = relation
+      .where(date: page_start_date..page_end_date)
       .group(:date)
-      .order(date: :desc)
       .select("date, SUM(steps) AS total_steps")
       .index_by(&:date)
 
-    # For days without an entry, synthesize a zero-steps entry so the view can render it
-    paginated_dates.map do |date|
+    # Build the page's date list (descending) and fill gaps with zero-step entries
+    (page_start_date..page_end_date).to_a.reverse.map do |date|
       totals_by_date[date] || new(date: date, steps: 0)
     end
   end

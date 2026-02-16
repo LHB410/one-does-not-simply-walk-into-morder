@@ -4,16 +4,15 @@ class User < ApplicationRecord
   has_one :step, dependent: :destroy
   has_many :path_users, dependent: :destroy
   has_many :paths, through: :path_users
+  has_many :daily_step_entries, dependent: :destroy
 
   validates :name, presence: true
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :token_color, presence: true
 
   after_create :create_associated_step
 
-  def total_miles
-    (step.total_steps / Step::STEPS_PER_MILE.to_f).round(2)
-  end
+  delegate :total_miles, to: :step
 
   def current_position_on_path(path)
     return nil unless path
