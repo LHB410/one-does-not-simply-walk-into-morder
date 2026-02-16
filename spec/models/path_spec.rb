@@ -5,6 +5,7 @@ RSpec.describe Path, type: :model do
     it { should have_many(:milestones).dependent(:destroy) }
     it { should have_many(:path_users).dependent(:destroy) }
     it { should have_many(:users).through(:path_users) }
+    it { should have_many(:daily_step_entries).dependent(:destroy) }
   end
 
   describe "validations" do

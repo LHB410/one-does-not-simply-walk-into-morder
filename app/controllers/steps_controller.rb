@@ -51,7 +51,7 @@ class StepsController < ApplicationController
       return render json: { error: "Unauthorized" }, status: :forbidden
     end
 
-    @step = Step.find(params[:id])
+    @step = Step.includes(:user).find(params[:id])
     steps_to_add = params[:steps].to_i
 
     if steps_to_add <= 0
@@ -59,7 +59,8 @@ class StepsController < ApplicationController
     end
 
     if @step.add_steps(steps_to_add, force: true)
-      @step.user.current_position_on_path(Path.current)&.update_progress
+      active_path = Path.current
+      @step.user.current_position_on_path(active_path)&.update_progress(active_path)
       respond_with_success
     else
       respond_with_error("Failed to update steps: #{@step.errors.full_messages.join(', ')}")
@@ -89,7 +90,7 @@ class StepsController < ApplicationController
   def update_user_path_progress
     active_path = Path.current
     path_user = current_user.current_position_on_path(active_path)
-    path_user&.update_progress
+    path_user&.update_progress(active_path)
   end
 
   def step_json(step)
