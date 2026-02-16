@@ -28,24 +28,31 @@ class Path < ApplicationRecord
   end
 
   def next_milestone_after(current_milestone)
-    milestones.where("sequence_order > ?", current_milestone.sequence_order).first
+    if milestones.loaded?
+      milestones
+        .select { |m| m.sequence_order > current_milestone.sequence_order }
+        .min_by(&:sequence_order)
+    else
+      milestones.where("sequence_order > ?", current_milestone.sequence_order).first
+    end
   end
 
   def milestone_for_distance(miles)
-    miles_int = miles.to_f.floor
+    miles_val = miles.to_f.floor
 
-    # Remove default sequence_order and order by cumulative_distance_miles instead
-    # This is more efficient than ordering by both sequence_order and cumulative_distance_miles
-    base_relation = milestones.unscope(:order)
-
-    # Find the highest milestone where cumulative_distance_miles <= miles_int
-    reached = base_relation
-      .where("cumulative_distance_miles <= ?", miles_int)
-      .order(cumulative_distance_miles: :desc)
-      .first
-
-    # Fallback to first milestone if none reached (shouldn't happen, but safe)
-    reached || base_relation.order(cumulative_distance_miles: :asc).first
+    if milestones.loaded?
+      reached = milestones
+        .select { |m| m.cumulative_distance_miles <= miles_val }
+        .max_by(&:cumulative_distance_miles)
+      reached || milestones.min_by(&:cumulative_distance_miles)
+    else
+      base_relation = milestones.unscope(:order)
+      reached = base_relation
+        .where("cumulative_distance_miles <= ?", miles_val)
+        .order(cumulative_distance_miles: :desc)
+        .first
+      reached || base_relation.order(cumulative_distance_miles: :asc).first
+    end
   end
 
 

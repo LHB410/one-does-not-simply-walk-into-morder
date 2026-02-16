@@ -5,6 +5,7 @@ RSpec.describe User, type: :model do
     it { should have_one(:step).dependent(:destroy) }
     it { should have_many(:path_users).dependent(:destroy) }
     it { should have_many(:paths).through(:path_users) }
+    it { should have_many(:daily_step_entries).dependent(:destroy) }
   end
 
   describe "validations" do
@@ -14,6 +15,10 @@ RSpec.describe User, type: :model do
     it { should validate_presence_of(:email) }
     it { should validate_uniqueness_of(:email) }
     it { should validate_presence_of(:token_color) }
+
+    it { should allow_value("user@example.com").for(:email) }
+    it { should_not allow_value("not-an-email").for(:email) }
+    it { should_not allow_value("@no-local.com").for(:email) }
   end
 
   describe "callbacks" do

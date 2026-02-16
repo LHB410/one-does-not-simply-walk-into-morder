@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_02_050000) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_16_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,8 +32,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_050000) do
     t.integer "distance_from_previous_miles", null: false
     t.integer "cumulative_distance_miles", null: false
     t.integer "sequence_order", null: false
-    t.decimal "map_position_x"
-    t.decimal "map_position_y"
+    t.decimal "map_position_x", null: false
+    t.decimal "map_position_y", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["path_id", "sequence_order"], name: "index_milestones_on_path_id_and_sequence_order", unique: true
@@ -47,6 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_050000) do
     t.decimal "progress_percentage", default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["current_milestone_id"], name: "index_path_users_on_current_milestone_id"
     t.index ["path_id", "user_id"], name: "index_path_users_on_path_id_and_user_id", unique: true
     t.index ["path_id"], name: "index_path_users_on_path_id"
     t.index ["user_id"], name: "index_path_users_on_user_id"
@@ -59,6 +60,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_050000) do
     t.boolean "active", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.check_constraint "part_number = ANY (ARRAY[1, 2])", name: "chk_paths_part_number"
   end
 
   create_table "steps", force: :cascade do |t|
@@ -78,7 +80,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_050000) do
     t.string "email", null: false
     t.string "password_digest", null: false
     t.boolean "admin", default: false
-    t.string "token_color"
+    t.string "token_color", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -87,6 +89,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_050000) do
   add_foreign_key "daily_step_entries", "paths"
   add_foreign_key "daily_step_entries", "users"
   add_foreign_key "milestones", "paths"
+  add_foreign_key "path_users", "milestones", column: "current_milestone_id"
   add_foreign_key "path_users", "paths"
   add_foreign_key "path_users", "users"
   add_foreign_key "steps", "users"
