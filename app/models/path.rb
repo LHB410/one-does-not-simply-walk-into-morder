@@ -2,6 +2,7 @@ class Path < ApplicationRecord
   has_many :milestones, -> { order(:sequence_order) }, dependent: :destroy
   has_many :path_users, dependent: :destroy
   has_many :users, through: :path_users
+  has_many :daily_step_entries, dependent: :destroy
 
   validates :name, :part_number, :total_distance_miles, presence: true
   validates :part_number, inclusion: { in: [ 1, 2 ] }
@@ -49,10 +50,6 @@ class Path < ApplicationRecord
 
 
   def all_users_completed?
-    return @all_users_completed if defined?(@all_users_completed)
-
-    # Use SQL aggregation instead of loading all records into memory
-    # Returns true if no path_users have progress < 100%
-    @all_users_completed = !path_users.where("progress_percentage < 100").exists?
+    !path_users.where("progress_percentage < 100").exists?
   end
 end

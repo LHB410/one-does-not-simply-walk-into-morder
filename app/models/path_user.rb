@@ -9,7 +9,7 @@ class PathUser < ApplicationRecord
   def update_progress
     user_miles = user.step.total_steps / Step::STEPS_PER_MILE.to_f
     self.current_milestone = path.milestone_for_distance(user_miles)
-    self.progress_percentage = (user_miles / path.total_distance_miles.to_f * 100).round(2)
+    self.progress_percentage = [ (user_miles / path.total_distance_miles.to_f * 100).round(2), 100.0 ].min
     save
   end
 end

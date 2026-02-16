@@ -13,33 +13,31 @@ module DashboardHelper
   end
 
   def calculate_token_position(path_user, path)
-  return { x: 10, y: 80 } unless path_user&.current_milestone
+    return { x: 10, y: 80 } unless path_user&.current_milestone
 
-  current_milestone = path_user.current_milestone
-  next_milestone = path.next_milestone_after(current_milestone)
+    current_milestone = path_user.current_milestone
+    next_milestone = path.next_milestone_after(current_milestone)
 
-  if next_milestone && path_user.progress_percentage < 100
-    # Compute segment progress using steps to avoid rounding snaps
-    current_steps = (current_milestone.cumulative_distance_miles * Step::STEPS_PER_MILE)
-    next_steps    = (next_milestone.cumulative_distance_miles * Step::STEPS_PER_MILE)
+    if next_milestone && path_user.progress_percentage < 100
+      current_steps = (current_milestone.cumulative_distance_miles * Step::STEPS_PER_MILE)
+      next_steps    = (next_milestone.cumulative_distance_miles * Step::STEPS_PER_MILE)
 
-    steps_from_current = [ path_user.user.step.total_steps - current_steps, 0 ].max
-    steps_to_next      = [ next_steps - current_steps, 0 ].max
+      steps_from_current = [ path_user.user.step.total_steps - current_steps, 0 ].max
+      steps_to_next      = [ next_steps - current_steps, 0 ].max
 
-    progress_fraction =
-      steps_to_next.positive? ? (steps_from_current / steps_to_next.to_f) : 0.0
-    progress_fraction = progress_fraction.clamp(0.0, 1.0)
+      progress_fraction =
+        steps_to_next.positive? ? (steps_from_current / steps_to_next.to_f) : 0.0
+      progress_fraction = progress_fraction.clamp(0.0, 1.0)
 
-    # Interpolate along the segment without mutating DB state here
-    x = current_milestone.map_position_x +
-        (next_milestone.map_position_x - current_milestone.map_position_x) * progress_fraction
-    y = current_milestone.map_position_y +
-        (next_milestone.map_position_y - current_milestone.map_position_y) * progress_fraction
+      x = current_milestone.map_position_x +
+          (next_milestone.map_position_x - current_milestone.map_position_x) * progress_fraction
+      y = current_milestone.map_position_y +
+          (next_milestone.map_position_y - current_milestone.map_position_y) * progress_fraction
 
-    { x: x, y: y }
-  else
-    { x: current_milestone.map_position_x, y: current_milestone.map_position_y }
-  end
+      { x: x, y: y }
+    else
+      { x: current_milestone.map_position_x, y: current_milestone.map_position_y }
+    end
   end
 
   # Efficiently find previous and upcoming milestones for a user's current position
@@ -51,5 +49,19 @@ module DashboardHelper
     reached, upcoming = milestones.partition { |m| m.cumulative_distance_miles <= user_miles }
 
     [ reached.last, upcoming.first || milestones.first ]
+  end
+
+  def location_text_for(user, path)
+    milestones = path&.milestones || []
+    user_miles = user.step.total_miles
+    prev_milestone, upcoming_milestone = find_milestones_for_user(milestones, user_miles)
+
+    if prev_milestone && upcoming_milestone && user_miles > prev_milestone.cumulative_distance_miles
+      "On the road from #{prev_milestone.name} to #{upcoming_milestone.name}"
+    elsif prev_milestone
+      prev_milestone.name
+    else
+      "The Shire"
+    end
   end
 end

@@ -29,38 +29,20 @@ class StepsController < ApplicationController
 
     override = current_user.admin? || params[:force].present?
     unless @step.can_update_today? || override
-      return render json: {
-        error: "Steps already updated today"
-      }, status: :unprocessable_entity
+      return respond_with_error("Steps already updated today")
     end
 
     steps_to_add = params[:steps].to_i
 
     if steps_to_add <= 0
-      return render json: {
-        error: "Steps must be greater than 0"
-      }, status: :unprocessable_entity
+      return respond_with_error("Steps must be greater than 0")
     end
 
     if @step.add_steps(steps_to_add, force: override)
       update_user_path_progress
-
-      respond_to do |format|
-        format.html { redirect_to root_path, notice: "Steps updated successfully!" }
-        format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.json { render json: { success: true, step: step_json(@step) }, status: :ok }
-        format.any { head :ok }
-      end
+      respond_with_success
     else
-      respond_to do |format|
-        format.html {
-          redirect_to root_path,
-          alert: "Failed to update steps: #{@step.errors.full_messages.join(', ')}"
-        }
-        format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.json { render json: { error: "Failed to update steps" }, status: :unprocessable_entity }
-        format.any { head :unprocessable_entity }
-      end
+      respond_with_error("Failed to update steps: #{@step.errors.full_messages.join(', ')}")
     end
   end
 
@@ -72,30 +54,37 @@ class StepsController < ApplicationController
     @step = Step.find(params[:id])
     steps_to_add = params[:steps].to_i
 
-    if @step.add_steps(steps_to_add, force: true)
-      user = @step.user
-      user.current_position_on_path(Path.current)&.update_progress
+    if steps_to_add <= 0
+      return respond_with_error("Steps must be greater than 0")
+    end
 
-      respond_to do |format|
-        format.html { redirect_to root_path, notice: "Steps updated successfully!" }
-        format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.json { render json: { success: true, step: step_json(@step) }, status: :ok }
-        format.any { head :ok }
-      end
+    if @step.add_steps(steps_to_add, force: true)
+      @step.user.current_position_on_path(Path.current)&.update_progress
+      respond_with_success
     else
-      respond_to do |format|
-        format.html {
-          redirect_to root_path,
-          alert: "Failed to update steps: #{@step.errors.full_messages.join(', ')}"
-        }
-        format.turbo_stream { redirect_to root_path, status: :see_other }
-        format.json { render json: { error: "Failed to update steps" }, status: :unprocessable_entity }
-        format.any { head :unprocessable_entity }
-      end
+      respond_with_error("Failed to update steps: #{@step.errors.full_messages.join(', ')}")
     end
   end
 
   private
+
+  def respond_with_success
+    respond_to do |format|
+      format.html { redirect_to root_path, notice: "Steps updated successfully!" }
+      format.turbo_stream { redirect_to root_path, status: :see_other }
+      format.json { render json: { success: true, step: step_json(@step) }, status: :ok }
+      format.any { head :ok }
+    end
+  end
+
+  def respond_with_error(message)
+    respond_to do |format|
+      format.html { redirect_to root_path, alert: message }
+      format.turbo_stream { redirect_to root_path, status: :see_other }
+      format.json { render json: { error: message }, status: :unprocessable_entity }
+      format.any { head :unprocessable_entity }
+    end
+  end
 
   def update_user_path_progress
     active_path = Path.current

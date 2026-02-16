@@ -13,6 +13,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # Health check for Heroku
+  # Health check for deployment
   get "up", to: "rails/health#show", as: :rails_health_check
 end

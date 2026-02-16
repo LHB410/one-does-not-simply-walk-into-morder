@@ -26,19 +26,7 @@
   <!-- Current Location -->
   <div class="bg-gray-900 bg-opacity-50 rounded p-3">
     <p class="text-gray-400 text-xs mb-1">Current Location</p>
-    <% milestones = @active_path&.milestones || [] %>
-    <% user_miles = user.step.total_miles %>
-    <% prev_milestone, upcoming_milestone = find_milestones_for_user(milestones, user_miles) %>
-
-    <% location_text =
-        if prev_milestone && upcoming_milestone && user_miles > prev_milestone.cumulative_distance_miles
-          "On the road from #{prev_milestone.name} to #{upcoming_milestone.name}"
-        elsif prev_milestone
-          prev_milestone.name
-        else
-          "The Shire" # If no previous milestone, start from the Shire
-        end %>
-    <p class="text-yellow-400 font-semibold"><%= location_text %></p>
+    <p class="text-yellow-400 font-semibold"><%= location_text_for(user, @active_path) %></p>
 
     <% path_user = user.current_position_on_path(@active_path) %>
     <div class="mt-2">

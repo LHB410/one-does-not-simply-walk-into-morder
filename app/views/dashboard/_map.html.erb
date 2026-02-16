@@ -1,14 +1,4 @@
 <!-- app/views/dashboard/_map.html.erb -->
-<%# Compute center target once %>
-<% begin %>
-  <% if defined?(current_user) && current_user.present? %>
-    <% cu_path_user = current_user.current_position_on_path(path) %>
-    <% cu_pos = cu_path_user ? calculate_token_position(cu_path_user, path) : nil %>
-  <% end %>
-<% rescue => e %>
-  <% cu_pos = nil %>
-<% end %>
-
 <div class="relative w-full h-full"
      data-controller="map-zoom"
      data-map-zoom-initial-scale-value="1.0"
