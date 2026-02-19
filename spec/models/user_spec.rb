@@ -41,6 +41,19 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "#fitbit_connected?" do
+    let(:user) { create(:user) }
+
+    it "returns true when fitbit_uid is present" do
+      user.update!(fitbit_uid: "ABC123")
+      expect(user.fitbit_connected?).to be true
+    end
+
+    it "returns false when fitbit_uid is nil" do
+      expect(user.fitbit_connected?).to be false
+    end
+  end
+
   describe "#current_position_on_path" do
     include_context "user with path progress"
 
