@@ -14,6 +14,10 @@ class User < ApplicationRecord
 
   delegate :total_miles, to: :step
 
+  def fitbit_connected?
+    fitbit_uid.present?
+  end
+
   def current_position_on_path(path)
     return nil unless path
     return path_users.detect { |pu| pu.path_id == path.id } if path_users.loaded?
