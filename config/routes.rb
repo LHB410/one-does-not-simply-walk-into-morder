@@ -13,6 +13,10 @@ Rails.application.routes.draw do
     end
   end
 
+  get "auth/fitbit/callback", to: "fitbit#callback", as: :fitbit_callback
+  get "auth/fitbit", to: "fitbit#connect", as: :fitbit_connect
+  delete "auth/fitbit", to: "fitbit#disconnect", as: :fitbit_disconnect
+
   # Health check for deployment
   get "up", to: "rails/health#show", as: :rails_health_check
 end

@@ -25,6 +25,8 @@ gem "bcrypt", "~> 3.1.7"
 # Background jobs
 gem "sidekiq", "~> 7.0"
 
+gem "oauth2"
+gem "faraday"
 
 
 gem "simple_form", "~> 5.0"
