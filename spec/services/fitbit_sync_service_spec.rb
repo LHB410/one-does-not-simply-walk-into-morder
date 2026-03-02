@@ -114,21 +114,17 @@ RSpec.describe FitbitSyncService do
       end
     end
 
-    context "when Fitbit returns zero steps" do
-      before { stub_fitbit_steps(0) }
-
-      it "does nothing and returns true" do
-        expect { service.call }.not_to change { user.step.reload.total_steps }
-        expect(service.call).to be true
-      end
-    end
-
     context "when user is not connected to Fitbit" do
       before { user.update!(fitbit_uid: nil) }
 
       it "returns false without calling the API" do
         expect_any_instance_of(FitbitClient).not_to receive(:fetch_steps)
         expect(service.call).to be false
+      end
+
+      it "logs the reason" do
+        expect(Rails.logger).to receive(:warn).with(/no fitbit_uid/)
+        service.call
       end
     end
 
@@ -142,6 +138,25 @@ RSpec.describe FitbitSyncService do
       it "returns false" do
         expect(service.call).to be false
       end
+
+      it "logs the reason" do
+        expect(Rails.logger).to receive(:warn).with(/no active path/)
+        service.call
+      end
+    end
+
+    context "when Fitbit returns zero steps" do
+      before { stub_fitbit_steps(0) }
+
+      it "does nothing and returns true" do
+        expect { service.call }.not_to change { user.step.reload.total_steps }
+        expect(service.call).to be true
+      end
+
+      it "logs the reason" do
+        expect(Rails.logger).to receive(:info).with(/Fitbit returned 0 steps/)
+        service.call
+      end
     end
 
     context "when the Fitbit token has expired" do
@@ -154,6 +169,11 @@ RSpec.describe FitbitSyncService do
         expect(service.call).to be false
         expect(user.step.reload.total_steps).to eq(0)
       end
+
+      it "logs a warning" do
+        expect(Rails.logger).to receive(:warn).with(/Token expired/)
+        service.call
+      end
     end
 
     context "when the Fitbit API returns an error" do
@@ -165,6 +185,11 @@ RSpec.describe FitbitSyncService do
       it "returns false and does not modify steps" do
         expect(service.call).to be false
         expect(user.step.reload.total_steps).to eq(0)
+      end
+
+      it "logs the error" do
+        expect(Rails.logger).to receive(:error).with(/Fitbit sync failed.*ApiError/)
+        service.call
       end
     end
   end

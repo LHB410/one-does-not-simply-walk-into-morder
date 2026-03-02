@@ -18,6 +18,10 @@ class User < ApplicationRecord
     fitbit_uid.present?
   end
 
+  def fitbit_needs_reconnect?
+    fitbit_uid.present? && fitbit_access_token.blank?
+  end
+
   def current_position_on_path(path)
     return nil unless path
     return path_users.detect { |pu| pu.path_id == path.id } if path_users.loaded?

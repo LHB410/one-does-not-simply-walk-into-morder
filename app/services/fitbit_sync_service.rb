@@ -5,13 +5,22 @@ class FitbitSyncService
   end
 
   def call
-    return false unless @user.fitbit_uid.present?
+    unless @user.fitbit_uid.present?
+      Rails.logger.warn("Fitbit sync aborted for user #{@user.id}: no fitbit_uid")
+      return false
+    end
 
     fitbit_steps = @client.fetch_steps(Date.current)
-    return true if fitbit_steps.zero?
+    if fitbit_steps.zero?
+      Rails.logger.info("Fitbit sync user #{@user.id}: Fitbit returned 0 steps for #{Date.current}, skipping")
+      return true
+    end
 
     active_path = Path.current
-    return false unless active_path
+    unless active_path
+      Rails.logger.warn("Fitbit sync aborted for user #{@user.id}: no active path (Path.current is nil)")
+      return false
+    end
 
     record_steps(fitbit_steps, active_path)
     @user.update!(fitbit_last_sync_at: Time.current)
