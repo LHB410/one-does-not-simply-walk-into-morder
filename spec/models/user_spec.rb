@@ -54,6 +54,24 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "#fitbit_needs_reconnect?" do
+    let(:user) { create(:user) }
+
+    it "returns true when uid is present but access token is blank" do
+      user.update!(fitbit_uid: "ABC123", fitbit_access_token: nil)
+      expect(user.fitbit_needs_reconnect?).to be true
+    end
+
+    it "returns false when fully connected" do
+      user.update!(fitbit_uid: "ABC123", fitbit_access_token: "token")
+      expect(user.fitbit_needs_reconnect?).to be false
+    end
+
+    it "returns false when never connected" do
+      expect(user.fitbit_needs_reconnect?).to be false
+    end
+  end
+
   describe "#current_position_on_path" do
     include_context "user with path progress"
 

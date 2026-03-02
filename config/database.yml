@@ -61,12 +61,11 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  primary:
+  primary: &primary_test
     <<: *default
     database: one_does_not_simply_walk_into_morder_test
   queue:
-    <<: *default
-    database: one_does_not_simply_walk_into_morder_test_queue
+    <<: *primary_test
     migrations_paths: db/queue_migrate
 
 # As with config/credentials.yml, you never want to store sensitive information,

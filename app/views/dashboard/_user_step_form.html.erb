@@ -111,7 +111,20 @@
   <!-- Fitbit -->
   <% if is_current_user %>
     <div class="mt-3 pt-3 border-t border-gray-700">
-      <% if user.fitbit_connected? %>
+      <% if user.fitbit_needs_reconnect? %>
+        <div class="bg-red-900 bg-opacity-30 border border-red-700 rounded-md p-3 mb-2">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="inline-block w-2 h-2 bg-red-400 rounded-full"></span>
+            <span class="text-xs text-red-300 font-semibold">Fitbit session expired</span>
+          </div>
+          <%= link_to fitbit_connect_path,
+            id: "fitbit-connect-link",
+            data: { controller: "fitbit-connect" },
+            class: "block w-full py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md text-center transition-colors duration-200" do %>
+            Reconnect Fitbit
+          <% end %>
+        </div>
+      <% elsif user.fitbit_connected? %>
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span>

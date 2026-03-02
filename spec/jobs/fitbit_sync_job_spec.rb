@@ -46,6 +46,15 @@ RSpec.describe FitbitSyncJob, type: :job do
         described_class.new.perform(user.id)
       }.not_to have_enqueued_job(described_class)
     end
+
+    it "still reschedules when tokens are expired but uid exists" do
+      user.update!(fitbit_access_token: nil, fitbit_refresh_token: nil, fitbit_token_expires_at: nil)
+      allow_any_instance_of(FitbitSyncService).to receive(:call).and_return(false)
+
+      expect {
+        described_class.new.perform(user.id)
+      }.to have_enqueued_job(described_class).with(user.id)
+    end
   end
 
   describe ".schedule_for" do

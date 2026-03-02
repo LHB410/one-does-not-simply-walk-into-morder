@@ -32,14 +32,42 @@ class FitbitClient
 
   def fetch_steps(date = Date.current)
     refresh_token_if_needed!
-    response = connection.get("/1/user/-/activities/date/#{date.strftime('%Y-%m-%d')}.json")
-    JSON.parse(response.body).dig("summary", "steps").to_i
+    response = request_steps(date)
+
+    if response.status == 401
+      Rails.logger.info("Fitbit 401 for user #{@user.id}, forcing token refresh and retrying")
+      force_refresh_token!
+      response = request_steps(date)
+    end
+
+    unless response.success?
+      Rails.logger.error("Fitbit API error for user #{@user.id}: HTTP #{response.status} — #{response.body.truncate(200)}")
+      raise ApiError, "Fitbit API returned HTTP #{response.status}"
+    end
+
+    steps = JSON.parse(response.body).dig("summary", "steps")
+    if steps.nil?
+      Rails.logger.error("Fitbit API response missing steps for user #{@user.id}: #{response.body.truncate(200)}")
+      raise ApiError, "Fitbit API response missing 'summary.steps'"
+    end
+
+    steps.to_i
   end
 
   private
 
+  def request_steps(date)
+    connection.get("/1/user/-/activities/date/#{date.strftime('%Y-%m-%d')}.json")
+  end
+
   def refresh_token_if_needed!
-    return unless @user.fitbit_token_expires_at&.past?
+    return if @user.fitbit_token_expires_at.present? && @user.fitbit_token_expires_at.future?
+
+    force_refresh_token!
+  end
+
+  def force_refresh_token!
+    @connection = nil
 
     new_token = OAuth2::AccessToken.new(
       self.class.oauth_client,
@@ -55,8 +83,8 @@ class FitbitClient
   rescue OAuth2::Error => e
     Rails.logger.error("Fitbit token refresh failed for user #{@user.id}: #{e.message}")
     @user.update!(fitbit_access_token: nil, fitbit_refresh_token: nil,
-                  fitbit_token_expires_at: nil, fitbit_uid: nil)
-    raise TokenRefreshError, "Token refresh failed — user disconnected."
+                  fitbit_token_expires_at: nil)
+    raise TokenRefreshError, "Token refresh failed — please reconnect Fitbit."
   end
 
   def connection
