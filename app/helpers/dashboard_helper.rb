@@ -51,6 +51,15 @@ module DashboardHelper
     [ reached.last, upcoming.first || milestones.first ]
   end
 
+  def reached_milestones_for(user, path)
+    return Set.new unless user&.step && path&.milestones
+    user_miles = user.step.total_steps / Step::STEPS_PER_MILE.to_f
+    path.milestones
+        .select { |m| m.cumulative_distance_miles <= user_miles }
+        .map(&:id)
+        .to_set
+  end
+
   def location_text_for(user, path)
     milestones = path&.milestones || []
     user_miles = user.step.total_miles

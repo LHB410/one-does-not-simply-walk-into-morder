@@ -27,19 +27,19 @@ journey = Path.create!(
 # All milestones with cumulative distances from Shire
 milestones = [
   # Journey to Mordor
-  { name: "Shire", distance: 0, cumulative: 0, x: 21.10, y: 27.42 },
-  { name: "Rivendell", distance: 458, cumulative: 458, x: 47.73, y: 26.82 },
-  { name: "Moria", distance: 175, cumulative: 633, x: 45.96, y: 38.66 },
-  { name: "Lothlórien", distance: 122, cumulative: 755, x: 52.66, y: 41.22 },
-  { name: "Falls of Rauros", distance: 389, cumulative: 1144, x: 62.52, y: 61.54 },
-  { name: "Dead Marshes", distance: 102, cumulative: 1246, x: 66.47, y: 60.55 },
-  { name: "Shelob's Lair", distance: 189, cumulative: 1435, x: 73.18, y: 68.44 },
-  { name: "Mount Doom", distance: 179, cumulative: 1614, x: 77.71, y: 65.68 },
+  { name: "Shire",          distance: 0,    cumulative: 0,    x: 21.10, y: 27.42,  shop_url: nil },
+  { name: "Rivendell",      distance: 458,  cumulative: 458,  x: 47.73, y: 26.82,  shop_url: "https://www.etsy.com/search?q=rivendell+enamel+pin" },
+  { name: "Moria",          distance: 175,  cumulative: 633,  x: 45.96, y: 38.66,  shop_url: "https://www.etsy.com/search?q=moria+mines+enamel+pin" },
+  { name: "Lothlórien",     distance: 122,  cumulative: 755,  x: 52.66, y: 41.22,  shop_url: "https://www.etsy.com/search?q=lothlorien+enamel+pin" },
+  { name: "Falls of Rauros",distance: 389,  cumulative: 1144, x: 62.52, y: 61.54,  shop_url: "https://www.etsy.com/search?q=falls+of+rauros+pin" },
+  { name: "Dead Marshes",   distance: 102,  cumulative: 1246, x: 66.47, y: 60.55,  shop_url: "https://www.etsy.com/search?q=dead+marshes+lord+of+the+rings+pin" },
+  { name: "Shelob's Lair",  distance: 189,  cumulative: 1435, x: 73.18, y: 68.44,  shop_url: "https://www.etsy.com/search?q=shelob+spider+enamel+pin" },
+  { name: "Mount Doom",     distance: 179,  cumulative: 1614, x: 77.71, y: 65.68,  shop_url: "https://www.etsy.com/search?q=mount+doom+mordor+enamel+pin" },
   # Return journey
-  { name: "Minas Tirith", distance: 160, cumulative: 1774, x: 68.49, y: 70.49 },
-  { name: "Isengard", distance: 535, cumulative: 2309, x: 41.97, y: 53.92 },
-  { name: "Hobbiton", distance: 1090, cumulative: 3399, x: 17.56, y: 27.81 },
-  { name: "Grey Havens", distance: 260, cumulative: 3659, x: 6.42, y: 26.795 }
+  { name: "Minas Tirith",   distance: 160,  cumulative: 1774, x: 68.49, y: 70.49,  shop_url: "https://www.etsy.com/search?q=minas+tirith+enamel+pin" },
+  { name: "Isengard",       distance: 535,  cumulative: 2309, x: 41.97, y: 53.92,  shop_url: "https://www.etsy.com/search?q=isengard+orthanc+enamel+pin" },
+  { name: "Hobbiton",       distance: 1090, cumulative: 3399, x: 17.56, y: 27.81,  shop_url: "https://www.etsy.com/search?q=hobbiton+shire+enamel+pin" },
+  { name: "Grey Havens",    distance: 260,  cumulative: 3659, x: 6.42,  y: 26.795, shop_url: "https://www.etsy.com/search?q=grey+havens+enamel+pin" }
 ]
 
 milestones.each_with_index do |milestone_data, index|
@@ -50,7 +50,8 @@ milestones.each_with_index do |milestone_data, index|
     cumulative_distance_miles: milestone_data[:cumulative],
     sequence_order: index,
     map_position_x: milestone_data[:x],
-    map_position_y: milestone_data[:y]
+    map_position_y: milestone_data[:y],
+    shop_url: milestone_data[:shop_url]
   )
 end
 

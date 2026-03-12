@@ -17,6 +17,16 @@
          viewBox="0 0 100 100"
          preserveAspectRatio="xMidYMid meet">
 
+      <defs>
+        <filter id="milestone-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="0.5" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
       <!-- The Journey Path -->
       <path id="journey-path"
             d="<%= path_coordinates(path) %>"
@@ -27,27 +37,36 @@
             opacity="1" />
 
       <!-- Milestone Markers -->
+      <% reached_ids = reached_milestones_for(current_user, path) %>
       <% path&.milestones&.each do |milestone| %>
+        <% reached = reached_ids.include?(milestone.id) && milestone.shop_url.present? %>
+        <% if reached %>
+          <a href="<%= milestone.shop_url %>" target="_blank" rel="noopener noreferrer"
+             aria-label="Buy a <%= milestone.name %> pin"
+             style="pointer-events: auto; cursor: pointer;">
+        <% end %>
+
         <g class="milestone-marker" data-milestone-id="<%= milestone.id %>">
-          <!-- Marker Circle -->
           <circle cx="<%= milestone.map_position_x %>"
                   cy="<%= milestone.map_position_y %>"
                   r="0.8"
-                  fill="#8B0000"
+                  fill="<%= reached ? '#FFD700' : '#8B0000' %>"
                   stroke="#FFD700"
-                  stroke-width="0.3" />
-
-          <!-- Milestone Name -->
+                  stroke-width="<%= reached ? '0.5' : '0.3' %>"
+                  <%= reached ? 'filter="url(#milestone-glow)"' : '' %> />
           <text x="<%= milestone.map_position_x %>"
                 y="<%= milestone.map_position_y - 2 %>"
                 font-size="0"
-                fill="#2C1810"
+                fill="<%= reached ? '#FFD700' : '#2C1810' %>"
                 font-weight="bold"
-                text-anchor="middle"
-                class="pointer-events-auto">
+                text-anchor="middle">
             <%= milestone.name %>
           </text>
         </g>
+
+        <% if reached %>
+          </a>
+        <% end %>
       <% end %>
 
       <!-- User Tokens -->

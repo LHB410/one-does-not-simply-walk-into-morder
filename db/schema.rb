@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_16_191009) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_12_034130) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -36,6 +36,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_16_191009) do
     t.decimal "map_position_y", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "shop_url"
     t.index ["path_id", "sequence_order"], name: "index_milestones_on_path_id_and_sequence_order", unique: true
     t.index ["path_id"], name: "index_milestones_on_path_id"
   end
