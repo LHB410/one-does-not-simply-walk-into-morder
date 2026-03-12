@@ -29,7 +29,7 @@ journey = Path.create!(
 milestones = [
   # Journey to Mordor
   { name: "Shire",          distance: 0,    cumulative: 0,    x: 21.10, y: 27.42,  shop_url: nil,                                                              icon_filename: nil },
-  { name: "Rivendell",      distance: 458,  cumulative: 458,  x: 47.73, y: 26.82,  shop_url: "https://www.etsy.com/search?q=rivendell+enamel+pin",            icon_filename: "rivendell.svg" },
+  { name: "Rivendell",      distance: 458,  cumulative: 458,  x: 47.73, y: 26.82,  shop_url: "https://www.etsy.com/listing/634107452/you-have-my-lotr-pins?ls=a&ref=sold_out_ad-1&pro=1&plkey=LT91cda7b63f430e2a843b0ea02266cdfd031aa80c%3A634107452&variation0=1752825677",            icon_filename: "rivendell.svg" },
   { name: "Moria",          distance: 175,  cumulative: 633,  x: 45.96, y: 38.66,  shop_url: "https://www.etsy.com/search?q=moria+mines+enamel+pin",          icon_filename: nil },
   { name: "Lothlórien",     distance: 122,  cumulative: 755,  x: 52.66, y: 41.22,  shop_url: "https://www.etsy.com/search?q=lothlorien+enamel+pin",           icon_filename: nil },
   { name: "Falls of Rauros",distance: 389,  cumulative: 1144, x: 62.52, y: 61.54,  shop_url: "https://www.etsy.com/search?q=falls+of+rauros+pin",             icon_filename: nil },
