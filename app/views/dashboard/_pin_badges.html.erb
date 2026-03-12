@@ -1,0 +1,21 @@
+<turbo-frame id="pin_badges">
+  <% purchased = current_user.purchased_pin_milestones %>
+  <% if purchased.any? %>
+    <div class="mb-2">
+      <span class="inline-block text-xs px-2 py-0.5 bg-yellow-900 border border-yellow-600 text-center rounded-full text-yellow-300 mb-2">
+        Badges Collected
+      </span>
+    </div>
+    <div class="flex flex-wrap gap-3 mt-1">
+      <% purchased.each do |milestone| %>
+        <div class="relative group flex items-center">
+          <% if milestone.icon_filename.present? %>
+            <%= image_tag milestone.icon_filename,
+                          style: "width: 40px; height: 40px;",
+                          alt: milestone.name %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</turbo-frame>

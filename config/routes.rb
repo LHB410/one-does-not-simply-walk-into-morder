@@ -13,6 +13,11 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :milestones, only: [] do
+    resource :pin, only: [ :new, :create ], controller: "milestone_pins"
+  end
+  get "milestone_pin/dismiss", to: "milestone_pins#dismiss", as: :dismiss_milestone_popup
+
   get "auth/fitbit/callback", to: "fitbit#callback", as: :fitbit_callback
   get "auth/fitbit", to: "fitbit#connect", as: :fitbit_connect
   delete "auth/fitbit", to: "fitbit#disconnect", as: :fitbit_disconnect

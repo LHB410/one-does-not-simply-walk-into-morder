@@ -5,6 +5,8 @@ class User < ApplicationRecord
   has_many :path_users, dependent: :destroy
   has_many :paths, through: :path_users
   has_many :daily_step_entries, dependent: :destroy
+  has_many :milestone_pin_purchases, dependent: :destroy
+  has_many :purchased_pin_milestones, through: :milestone_pin_purchases, source: :milestone
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }

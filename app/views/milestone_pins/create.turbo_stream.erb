@@ -1,0 +1,19 @@
+<%= turbo_stream.replace "pin_badges",
+      partial: "dashboard/pin_badges",
+      locals: { current_user: current_user, path: @path } %>
+
+<%= turbo_stream.replace "milestone_popup" do %>
+  <turbo-frame id="milestone_popup">
+    <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-stone-800 rounded-lg shadow-2xl p-8 max-w-md w-full border-4 border-green-600">
+        <div class="text-center">
+          <p class="text-3xl font-bold text-green-400 mb-2" style="font-family: 'Cinzel', serif;">✓ Pin Collected!</p>
+          <p class="text-gray-300 text-sm italic mb-6">Your commemorative pin has been recorded. Safe travels!</p>
+          <%= link_to "Close", dismiss_milestone_popup_path,
+                data: { turbo_frame: "milestone_popup" },
+                class: "inline-block py-2 px-6 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-md transition-colors duration-200" %>
+        </div>
+      </div>
+    </div>
+  </turbo-frame>
+<% end %>

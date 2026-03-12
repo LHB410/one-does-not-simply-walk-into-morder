@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_16_191009) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_12_042250) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_16_191009) do
     t.index ["user_id"], name: "index_daily_step_entries_on_user_id"
   end
 
+  create_table "milestone_pin_purchases", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "milestone_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["milestone_id"], name: "index_milestone_pin_purchases_on_milestone_id"
+    t.index ["user_id", "milestone_id"], name: "index_milestone_pin_purchases_on_user_id_and_milestone_id", unique: true
+    t.index ["user_id"], name: "index_milestone_pin_purchases_on_user_id"
+  end
+
   create_table "milestones", force: :cascade do |t|
     t.bigint "path_id", null: false
     t.string "name", null: false
@@ -36,6 +46,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_16_191009) do
     t.decimal "map_position_y", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "shop_url"
+    t.string "icon_filename"
     t.index ["path_id", "sequence_order"], name: "index_milestones_on_path_id_and_sequence_order", unique: true
     t.index ["path_id"], name: "index_milestones_on_path_id"
   end
@@ -94,6 +106,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_16_191009) do
 
   add_foreign_key "daily_step_entries", "paths"
   add_foreign_key "daily_step_entries", "users"
+  add_foreign_key "milestone_pin_purchases", "milestones"
+  add_foreign_key "milestone_pin_purchases", "users"
   add_foreign_key "milestones", "paths"
   add_foreign_key "path_users", "milestones", column: "current_milestone_id"
   add_foreign_key "path_users", "paths"

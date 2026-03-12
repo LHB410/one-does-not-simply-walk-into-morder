@@ -51,6 +51,27 @@ module DashboardHelper
     [ reached.last, upcoming.first || milestones.first ]
   end
 
+  def purchased_milestone_ids_for(user)
+    return Set.new unless user&.milestone_pin_purchases
+    user.milestone_pin_purchases.map(&:milestone_id).to_set
+  end
+
+  def unconfirmed_reached_milestones_for(user, path)
+    reached   = reached_milestones_for(user, path)
+    purchased = purchased_milestone_ids_for(user)
+    return [] unless path&.milestones
+    path.milestones.select { |m| reached.include?(m.id) && !purchased.include?(m.id) && m.shop_url.present? }
+  end
+
+  def reached_milestones_for(user, path)
+    return Set.new unless user&.step && path&.milestones
+    user_miles = user.step.total_steps / Step::STEPS_PER_MILE.to_f
+    path.milestones
+        .select { |m| m.cumulative_distance_miles <= user_miles }
+        .map(&:id)
+        .to_set
+  end
+
   def location_text_for(user, path)
     milestones = path&.milestones || []
     user_miles = user.step.total_miles

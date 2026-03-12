@@ -1,0 +1,31 @@
+<turbo-frame id="milestone_popup">
+  <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-stone-800 rounded-lg shadow-2xl p-8 max-w-md w-full border-4 border-yellow-600">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold text-yellow-500 mb-2" style="font-family: 'Cinzel', serif;">
+          <%= @milestone.name %>
+        </h2>
+        <p class="text-gray-300 text-sm italic">
+          You've reached this milestone! Celebrate with a commemorative pin.
+        </p>
+      </div>
+
+      <%= link_to "🛒 Visit the Shop", @milestone.shop_url,
+            target: "_blank", rel: "noopener noreferrer",
+            class: "block text-center py-3 px-4 mb-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200" %>
+
+      <%= form_with url: milestone_pin_path(@milestone), method: :post do %>
+        <button type="submit"
+                class="w-full py-3 px-4 bg-green-800 hover:bg-green-700 text-white font-bold rounded-md transition-colors duration-200">
+          ✓ I've bought my pin!
+        </button>
+      <% end %>
+
+      <div class="mt-4 text-center">
+        <%= link_to "Maybe later", dismiss_milestone_popup_path,
+              data: { turbo_frame: "milestone_popup" },
+              class: "text-sm text-gray-400 hover:text-gray-200" %>
+      </div>
+    </div>
+  </div>
+</turbo-frame>

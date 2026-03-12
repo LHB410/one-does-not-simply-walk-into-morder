@@ -2,7 +2,7 @@ class FitbitSyncJob < ApplicationJob
   queue_as :default
 
   SYNC_HOUR = 23
-  SYNC_MINUTE = 50
+  SYNC_MINUTE = 59
 
   def perform(user_id)
     user = User.find_by(id: user_id)
