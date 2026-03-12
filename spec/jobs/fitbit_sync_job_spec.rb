@@ -75,7 +75,7 @@ RSpec.describe FitbitSyncJob, type: :job do
     end
 
     it "returns tomorrow if 23:59 has already passed today" do
-      travel_to Time.find_zone("America/New_York").parse("2026-02-16 23:55:00") do
+      travel_to Time.find_zone("America/New_York").parse("2026-02-16 23:59:30") do
         result = described_class.next_sync_time(user)
         in_user_zone = result.in_time_zone("America/New_York")
 
