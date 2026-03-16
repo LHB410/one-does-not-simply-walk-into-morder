@@ -192,5 +192,37 @@ RSpec.describe FitbitSyncService do
         service.call
       end
     end
+
+    context "when catching up a previous day's steps" do
+      let(:yesterday) { Date.current - 1 }
+
+      before do
+        # Simulate a partial sync from last night
+        DailyStepEntry.create!(user: user, path: active_path, date: yesterday, steps: 6063)
+        user.step.update!(total_steps: 6063, steps_today: 6063, last_updated_date: yesterday)
+        path_user.update_progress(active_path)
+      end
+
+      it "adds only the delta when Fitbit has more steps than recorded" do
+        allow_any_instance_of(FitbitClient).to receive(:fetch_steps).with(yesterday).and_return(10_509)
+
+        expect { service.call(date: yesterday) }.to change { user.step.reload.total_steps }.by(10_509 - 6063)
+      end
+
+      it "updates the daily entry to the correct Fitbit total" do
+        allow_any_instance_of(FitbitClient).to receive(:fetch_steps).with(yesterday).and_return(10_509)
+
+        service.call(date: yesterday)
+
+        entry = DailyStepEntry.find_by(user: user, path: active_path, date: yesterday)
+        expect(entry.steps).to eq(10_509)
+      end
+
+      it "does not change steps when Fitbit returns the same count" do
+        allow_any_instance_of(FitbitClient).to receive(:fetch_steps).with(yesterday).and_return(6063)
+
+        expect { service.call(date: yesterday) }.not_to change { user.step.reload.total_steps }
+      end
+    end
   end
 end
