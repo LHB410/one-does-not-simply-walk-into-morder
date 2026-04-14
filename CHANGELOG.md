@@ -2,7 +2,7 @@
 
 All notable changes to the Walk to Mordor project.
 
-## [Unreleased]
+## [1.0.0] - Stats Popup & CI Fixes
 
 ### Added
 - **Stats popup** — "View Stats" button replaces "Daily Step Report" with a tabbed popup containing Daily Steps, Pace Calculator, and Personal Bests
@@ -17,7 +17,7 @@ All notable changes to the Walk to Mordor project.
 - Updated nokogiri and rack to resolve CVEs
 
 ### Fixed
-- Removed duplicate `turbo_include_tags` in layout that broke importmap in Firefox (all Stimulus controllers were previously dead code)
+- Removed duplicate `turbo_include_tags` in layout that broke importmap
 
 ## [0.6.0] - Fitbit Catchup Job
 - Added 6 AM catchup sync job to capture same-day Fitbit step updates
