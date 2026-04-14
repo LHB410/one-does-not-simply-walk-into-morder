@@ -1,6 +1,12 @@
 class StepsController < ApplicationController
   before_action :require_login
 
+  def stats
+    @active_path = Path.current
+    load_daily_rows
+    load_stat_tabs
+  end
+
   def report
     @active_path = Path.current
     per_page = 10
@@ -84,6 +90,32 @@ class StepsController < ApplicationController
       format.turbo_stream { redirect_to root_path, status: :see_other }
       format.json { render json: { error: message }, status: :unprocessable_entity }
       format.any { head :unprocessable_entity }
+    end
+  end
+
+  def load_daily_rows
+    per_page = 10
+    @page = [ params[:page].to_i, 1 ].max
+
+    if @active_path
+      total_days = DailyStepEntry.total_days_for(user: current_user, path: @active_path)
+      @total_pages = [ (total_days / per_page.to_f).ceil, 1 ].max
+      @daily_rows = DailyStepEntry.daily_totals_for(
+        user: current_user, path: @active_path, page: @page, per_page: per_page
+      )
+    else
+      @total_pages = 1
+      @daily_rows = DailyStepEntry.none
+    end
+  end
+
+  def load_stat_tabs
+    if @active_path
+      @pace_estimates = helpers.pace_estimates(current_user, @active_path)
+      @personal_bests = helpers.personal_bests(current_user, @active_path)
+    else
+      @pace_estimates = []
+      @personal_bests = []
     end
   end
 

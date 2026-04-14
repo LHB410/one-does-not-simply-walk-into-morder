@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   delete "logout", to: "sessions#destroy"
 
   get "steps/report", to: "steps#report", as: :steps_report
+  get "steps/stats", to: "steps#stats", as: :steps_stats
 
   resources :steps, only: [ :update ] do
     member do

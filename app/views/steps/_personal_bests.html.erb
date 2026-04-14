@@ -1,0 +1,32 @@
+<div class="px-6 py-4">
+  <% if personal_bests.any? %>
+    <div class="space-y-2">
+      <% personal_bests.each_with_index do |best, index| %>
+        <div class="flex items-center gap-3 bg-gray-800 rounded p-3">
+          <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                      <%= case index
+                          when 0 then 'bg-yellow-500 text-gray-900'
+                          when 1 then 'bg-gray-300 text-gray-900'
+                          when 2 then 'bg-amber-700 text-white'
+                          else 'bg-gray-700 text-gray-300'
+                          end %>">
+            <%= index + 1 %>
+          </div>
+          <div class="flex-1">
+            <p class="text-white font-semibold text-sm">
+              <%= number_with_delimiter(best[:steps]) %> steps
+            </p>
+            <p class="text-gray-400 text-xs"><%= best[:miles] %> miles</p>
+          </div>
+          <div class="text-right">
+            <p class="text-gray-300 text-sm"><%= best[:date].strftime("%b %-d, %Y") %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-sm text-gray-400 py-2">
+      No step entries yet. Your best days will appear here!
+    </p>
+  <% end %>
+</div>

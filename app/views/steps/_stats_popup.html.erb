@@ -1,0 +1,117 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="stats-popup-title">
+  <div class="bg-gray-900 text-white rounded-lg shadow-2xl max-w-2xl max-h-[80vh] flex flex-col border border-yellow-700 pointer-events-auto mx-4 w-full"
+       data-controller="stats-tabs">
+
+    <%# Header %>
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+      <h2 id="stats-popup-title"
+          class="text-xl font-bold text-yellow-500"
+          style="font-family: 'Cinzel', serif;">
+        Your Stats
+      </h2>
+      <button type="button"
+              class="text-gray-400 hover:text-white rounded-full p-1"
+              aria-label="Close stats"
+              onclick="document.getElementById('stats-popup').innerHTML='';">
+        ✕
+      </button>
+    </div>
+
+    <%# Tab bar %>
+    <div class="flex border-b border-gray-800 px-6" role="tablist">
+      <button role="tab"
+              class="px-3 py-2 text-sm font-medium border-b-2 border-yellow-500 text-yellow-500 cursor-pointer"
+              data-stats-tabs-target="tab"
+              data-action="click->stats-tabs#selectTab"
+              data-tab-index="0"
+              aria-selected="true">
+        Daily Steps
+      </button>
+      <button role="tab"
+              class="px-3 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-200 cursor-pointer"
+              data-stats-tabs-target="tab"
+              data-action="click->stats-tabs#selectTab"
+              data-tab-index="1"
+              aria-selected="false">
+        Pace
+      </button>
+      <button role="tab"
+              class="px-3 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-200 cursor-pointer"
+              data-stats-tabs-target="tab"
+              data-action="click->stats-tabs#selectTab"
+              data-tab-index="2"
+              aria-selected="false">
+        Best Days
+      </button>
+    </div>
+
+    <%# Tab panels %>
+    <div class="overflow-y-auto flex-1">
+
+      <%# Daily Steps panel %>
+      <div role="tabpanel" data-stats-tabs-target="panel">
+        <div class="px-6 py-4">
+          <% if daily_rows.any? %>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-700 text-sm">
+                <thead class="bg-gray-800">
+                  <tr>
+                    <th scope="col" class="px-3 py-2 text-left font-semibold text-gray-300">Date</th>
+                    <th scope="col" class="px-3 py-2 text-right font-semibold text-gray-300">Steps Input</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800">
+                  <% daily_rows.each do |row| %>
+                    <tr>
+                      <td class="px-3 py-2"><%= row.date.strftime("%b %-d, %Y") %></td>
+                      <td class="px-3 py-2 text-right"><%= number_with_delimiter(row.try(:total_steps) || row.steps) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <p class="text-sm text-gray-400 py-2">No daily step entries yet.</p>
+          <% end %>
+        </div>
+
+        <div class="flex items-center justify-between p-3 border-t border-gray-800 text-xs text-gray-300">
+          <div>Page <%= page %> of <%= total_pages %></div>
+          <div class="flex items-center gap-2">
+            <% if page > 1 %>
+              <%= link_to "Previous",
+                          steps_stats_path(page: page - 1),
+                          data: { turbo_frame: "stats-popup" },
+                          class: "px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-200" %>
+            <% else %>
+              <span class="px-2 py-1 rounded bg-gray-900 text-gray-600 cursor-not-allowed">Previous</span>
+            <% end %>
+            <% if page < total_pages %>
+              <%= link_to "Next",
+                          steps_stats_path(page: page + 1),
+                          data: { turbo_frame: "stats-popup" },
+                          class: "px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-200" %>
+            <% else %>
+              <span class="px-2 py-1 rounded bg-gray-900 text-gray-600 cursor-not-allowed">Next</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# Pace Calculator panel %>
+      <div role="tabpanel" data-stats-tabs-target="panel" class="hidden">
+        <%= render "steps/pace_calculator", pace_estimates: pace_estimates %>
+      </div>
+
+      <%# Personal Bests panel %>
+      <div role="tabpanel" data-stats-tabs-target="panel" class="hidden">
+        <%= render "steps/personal_bests", personal_bests: personal_bests %>
+      </div>
+
+
+    </div>
+  </div>
+</div>

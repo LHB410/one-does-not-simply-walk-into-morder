@@ -24,6 +24,35 @@ RSpec.describe StepsController, type: :controller do
     end
   end
 
+  describe "GET #stats" do
+    before do
+      allow(Path).to receive(:current).and_return(active_path)
+    end
+
+    it "returns success and renders the stats template" do
+      get :stats
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template("steps/stats")
+    end
+
+    it "assigns daily_rows" do
+      DailyStepEntry.record!(user: user, path: active_path, date: Date.current, steps: 5000)
+      get :stats
+      expect(assigns(:daily_rows)).not_to be_nil
+    end
+
+    it "assigns pace_estimates" do
+      get :stats
+      expect(assigns(:pace_estimates)).not_to be_nil
+    end
+
+    it "assigns personal_bests" do
+      get :stats
+      expect(assigns(:personal_bests)).not_to be_nil
+    end
+
+  end
+
   describe "PATCH #update" do
     context "when can update today" do
       before do
