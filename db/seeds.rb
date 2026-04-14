@@ -32,7 +32,7 @@ milestones = [
   { name: "Rivendell",      distance: 458,  cumulative: 458,  x: 47.73, y: 26.82,  shop_url: "https://www.etsy.com/listing/634107452/you-have-my-lotr-pins?ls=a&ref=sold_out_ad-1&pro=1&plkey=LT91cda7b63f430e2a843b0ea02266cdfd031aa80c%3A634107452&variation0=1752825677",            icon_filename: "rivendell.svg" },
   { name: "Moria",          distance: 175,  cumulative: 633,  x: 45.96, y: 38.66,  shop_url: "https://www.etsy.com/search?q=moria+mines+enamel+pin",          icon_filename: nil },
   { name: "Lothlórien",     distance: 122,  cumulative: 755,  x: 52.66, y: 41.22,  shop_url: "https://www.etsy.com/search?q=lothlorien+enamel+pin",           icon_filename: nil },
-  { name: "Falls of Rauros",distance: 389,  cumulative: 1144, x: 62.52, y: 61.54,  shop_url: "https://www.etsy.com/search?q=falls+of+rauros+pin",             icon_filename: nil },
+  { name: "Falls of Rauros", distance: 389,  cumulative: 1144, x: 62.52, y: 61.54,  shop_url: "https://www.etsy.com/search?q=falls+of+rauros+pin",             icon_filename: nil },
   { name: "Dead Marshes",   distance: 102,  cumulative: 1246, x: 66.47, y: 60.55,  shop_url: "https://www.etsy.com/search?q=dead+marshes+lord+of+the+rings+pin", icon_filename: nil },
   { name: "Shelob's Lair",  distance: 189,  cumulative: 1435, x: 73.18, y: 68.44,  shop_url: "https://www.etsy.com/search?q=shelob+spider+enamel+pin",        icon_filename: nil },
   { name: "Mount Doom",     distance: 179,  cumulative: 1614, x: 77.71, y: 65.68,  shop_url: "https://www.etsy.com/search?q=mount+doom+mordor+enamel+pin",    icon_filename: nil },

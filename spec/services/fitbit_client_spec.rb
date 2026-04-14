@@ -16,7 +16,7 @@ RSpec.describe FitbitClient do
   let(:client) { described_class.new(user) }
 
   let(:success_body) { { "summary" => { "steps" => 8500 } }.to_json }
-  let(:error_body) { { "errors" => [{ "errorType" => "expired_token" }] }.to_json }
+  let(:error_body) { { "errors" => [ { "errorType" => "expired_token" } ] }.to_json }
 
   def stub_api_response(status:, body:)
     response = instance_double(Faraday::Response, status: status, body: body, success?: (200..299).cover?(status))

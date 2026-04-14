@@ -34,5 +34,4 @@ module StatsHelper
       }
     end
   end
-
 end

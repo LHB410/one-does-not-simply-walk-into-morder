@@ -50,7 +50,6 @@ RSpec.describe StepsController, type: :controller do
       get :stats
       expect(assigns(:personal_bests)).not_to be_nil
     end
-
   end
 
   describe "PATCH #update" do

@@ -107,5 +107,4 @@ RSpec.describe StatsHelper, type: :helper do
       end
     end
   end
-
 end
