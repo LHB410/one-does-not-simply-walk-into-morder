@@ -45,6 +45,7 @@ RSpec.describe FitbitClient do
     )
     access_token = instance_double(OAuth2::AccessToken)
     allow(access_token).to receive(:refresh!).and_return(new_token)
+    allow(FitbitClient).to receive(:oauth_client).and_return(instance_double(OAuth2::Client))
     allow(OAuth2::AccessToken).to receive(:new).and_return(access_token)
     new_token
   end
@@ -147,6 +148,7 @@ RSpec.describe FitbitClient do
         user.update!(fitbit_token_expires_at: 1.hour.ago)
         access_token = instance_double(OAuth2::AccessToken)
         allow(access_token).to receive(:refresh!).and_raise(OAuth2::Error.new(OpenStruct.new(body: "invalid_grant")))
+        allow(FitbitClient).to receive(:oauth_client).and_return(instance_double(OAuth2::Client))
         allow(OAuth2::AccessToken).to receive(:new).and_return(access_token)
       end
 
