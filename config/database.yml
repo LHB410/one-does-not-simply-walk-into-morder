@@ -64,8 +64,12 @@ test:
   primary: &primary_test
     <<: *default
     database: one_does_not_simply_walk_into_morder_test
+    host: <%= ENV.fetch("DB_HOST", "localhost") %>
+    username: <%= ENV.fetch("DB_USERNAME", "") %>
+    password: <%= ENV.fetch("DB_PASSWORD", "") %>
   queue:
     <<: *primary_test
+    database: one_does_not_simply_walk_into_morder_test_queue
     migrations_paths: db/queue_migrate
 
 # As with config/credentials.yml, you never want to store sensitive information,
