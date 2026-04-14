@@ -9,25 +9,7 @@ class StepsController < ApplicationController
 
   def report
     @active_path = Path.current
-    per_page = 10
-    @page = params[:page].to_i
-    @page = 1 if @page < 1
-
-    if @active_path
-      total_days = DailyStepEntry.total_days_for(user: current_user, path: @active_path)
-      @total_pages = (total_days / per_page.to_f).ceil
-      @total_pages = 1 if @total_pages.zero?
-
-      @daily_rows = DailyStepEntry.daily_totals_for(
-        user: current_user,
-        path: @active_path,
-        page: @page,
-        per_page: per_page
-      )
-    else
-      @total_pages = 1
-      @daily_rows = DailyStepEntry.none
-    end
+    load_daily_rows
   end
 
   def update
@@ -97,26 +79,28 @@ class StepsController < ApplicationController
     per_page = 10
     @page = [ params[:page].to_i, 1 ].max
 
-    if @active_path
-      total_days = DailyStepEntry.total_days_for(user: current_user, path: @active_path)
-      @total_pages = [ (total_days / per_page.to_f).ceil, 1 ].max
-      @daily_rows = DailyStepEntry.daily_totals_for(
-        user: current_user, path: @active_path, page: @page, per_page: per_page
-      )
-    else
+    unless @active_path
       @total_pages = 1
       @daily_rows = DailyStepEntry.none
+      return
     end
+
+    total_days = DailyStepEntry.total_days_for(user: current_user, path: @active_path)
+    @total_pages = [ (total_days / per_page.to_f).ceil, 1 ].max
+    @daily_rows = DailyStepEntry.daily_totals_for(
+      user: current_user, path: @active_path, page: @page, per_page: per_page
+    )
   end
 
   def load_stat_tabs
-    if @active_path
-      @pace_estimates = helpers.pace_estimates(current_user, @active_path)
-      @personal_bests = helpers.personal_bests(current_user, @active_path)
-    else
+    unless @active_path
       @pace_estimates = []
       @personal_bests = []
+      return
     end
+
+    @pace_estimates = helpers.pace_estimates(current_user, @active_path)
+    @personal_bests = helpers.personal_bests(current_user, @active_path)
   end
 
   def update_user_path_progress
