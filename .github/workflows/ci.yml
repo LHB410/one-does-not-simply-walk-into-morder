@@ -19,7 +19,7 @@ jobs:
           bundler-cache: true
 
       - name: Check for vulnerable gems
-        run: bundle-audit check --update
+        run: bundle exec bundle-audit check --update
 
   lint:
     runs-on: ubuntu-latest
