@@ -32,15 +32,15 @@ This app transforms your daily steps into progress along the epic journey from t
 ## Technology Stack
 
 - **Ruby**: 3.4.4
-- **Rails**: 8.0.2
+- **Rails**: 8.0.5
 - **Database**: PostgreSQL
 - **Frontend**:
   - Tailwind CSS for styling
   - Stimulus.js for JavaScript interactions
   - Turbo for SPA-like navigation
-- **Scheduled Tasks**: Clockwork for running scheduled jobs
+- **Background Jobs**: Solid Queue
 - **Authentication**: bcrypt for secure password hashing
-- **External Services**: Google Sheets API integration
+- **External Services**: Fitbit OAuth2 integration (optional)
 
 ## System Dependencies
 
@@ -56,8 +56,11 @@ This app transforms your daily steps into progress along the epic journey from t
    ```
 3. Set up environment variables (create a `.env` file):
    - Database credentials
-   - Google Sheets API credentials (optional - only needed if you want to use Google Sheets for step updates)
-   - Any other required API keys
+   - Fitbit OAuth credentials (optional — only needed for Fitbit sync):
+     - `FITBIT_CLIENT_ID`
+     - `FITBIT_CLIENT_SECRET`
+     - `FITBIT_AUTH_URL`
+     - `FITBIT_REFRESH_URL`
 
 ## Database Setup
 
@@ -88,9 +91,9 @@ rails server
 
 The application will be available at `http://localhost:3000`
 
-### Scheduled Tasks
+### Fitbit Sync
 
-If Google Sheets integration is configured, the app uses Clockwork to schedule daily step updates. The scheduled job runs at 11:59 PM CST daily to fetch step data from a Google Sheet (which users must manually update) and update each user's progress. Clockwork is configured in `lib/clockwork.rb`. Note: The app works without Google Sheets - users can update their steps directly in the app instead.
+Users can optionally connect their Fitbit account for automatic step syncing. When connected, a daily sync job runs at 11:50 PM in the user's timezone and reschedules itself for the next day. The app works without Fitbit — users can update their steps manually.
 
 ## How It Works
 
@@ -115,15 +118,16 @@ The app tracks a single continuous journey from the Shire to Mordor and back to 
 
 Steps are converted to miles using the average of 2,112 steps per mile. Steps can be updated in two ways:
 - **Manual Entry**: Users can update their daily steps directly in the app at any time
-- **Google Sheets** (optional): Users manually update a Google Sheet with their step counts, and the daily job fetches this data at 11:59 PM CST each night
+- **Fitbit Sync** (optional): Connect your Fitbit account for automatic daily step syncing
 
 All steps are automatically converted to progress along the path.
 
 ### User Features
 
-- **Step Updates**: Update your daily steps directly in the app, or manually update a Google Sheet (if configured) for automatic nightly processing
+- **Step Updates**: Update your daily steps directly in the app, or connect Fitbit for automatic syncing
 - **Progress Tracking**: See how many miles you've walked and how far until the next milestone
 - **Group Visibility**: View all friends' progress on the interactive map
+- **Stats Popup**: View daily step history, pace estimates to upcoming milestones, personal bests, and collected badges
 - **Milestone Achievements**: When you reach a milestone, you can purchase a physical pin to commemorate the achievement
 
 ## Testing
@@ -138,16 +142,18 @@ The app uses RSpec for testing with FactoryBot for test data and Shoulda Matcher
 
 ## Services
 
-- **Daily Step Update Job**: If Google Sheets is configured, automatically fetches step data from a Google Sheet (which users must manually update) and updates user progress (runs via Clockwork at 11:59 PM CST daily)
-- **Google Sheets Service**: Optional integration that retrieves daily step counts from a Google Sheet. Users must manually update the Google Sheet with their step counts - the service only reads from it, it does not write to it.
+- **FitbitClient**: Handles Fitbit OAuth2 token lifecycle (auto-refresh on 401) and step fetching
+- **FitbitSyncService**: Fetches today's steps from Fitbit and delegates to the step model
+- **FitbitSyncJob**: Runs daily at 11:50 PM in the user's timezone and reschedules itself
 
 ## Project Structure
 
-- `app/models/`: Core models (User, Path, Step, Milestone, PathUser)
-- `app/controllers/`: Dashboard, Sessions, and Steps controllers
+- `app/models/`: Core models (User, Path, Step, Milestone, PathUser, DailyStepEntry, MilestonePinPurchase)
+- `app/controllers/`: Dashboard, Sessions, Steps, Fitbit, and MilestonePins controllers
 - `app/views/`: ERB templates with Tailwind CSS styling
-- `app/services/`: Business logic services
-- `app/jobs/`: Background job definitions
+- `app/services/`: Business logic (FitbitClient, FitbitSyncService)
+- `app/jobs/`: Background jobs via Solid Queue (FitbitSyncJob)
+- `app/helpers/`: Stats and dashboard helpers
 - `db/seeds.rb`: Initial data setup including paths and milestones
 
 ## Contributing
