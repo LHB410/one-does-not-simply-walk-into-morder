@@ -1,0 +1,23 @@
+<div class="px-6 py-4">
+  <% if pace_estimates.any? %>
+    <p class="text-sm text-gray-400 mb-4">Based on your average daily steps:</p>
+    <div class="space-y-3">
+      <% pace_estimates.each do |estimate| %>
+        <div class="flex items-center justify-between bg-gray-800 rounded p-3">
+          <div>
+            <p class="text-white font-semibold text-sm"><%= estimate[:name] %></p>
+            <p class="text-gray-400 text-xs"><%= estimate[:miles_away] %> miles away</p>
+          </div>
+          <div class="text-right">
+            <p class="text-yellow-500 font-bold text-sm"><%= estimate[:estimated_date].strftime("%b %-d, %Y") %></p>
+            <p class="text-gray-400 text-xs"><%= (estimate[:estimated_date] - Date.current).to_i %> days</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-sm text-gray-400 py-2">
+      Not enough data yet. Start logging steps to see your pace estimates!
+    </p>
+  <% end %>
+</div>

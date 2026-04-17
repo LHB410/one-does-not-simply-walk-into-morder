@@ -1,0 +1,4 @@
+---
+ignore:
+  # JRuby-only integer overflow at cost=31 — not applicable on MRI Ruby
+  - CVE-2026-33306

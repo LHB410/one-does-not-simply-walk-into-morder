@@ -1,0 +1,18 @@
+<div class="px-6 py-4">
+  <% if purchased_badges.any? %>
+    <div class="flex flex-wrap gap-4">
+      <% purchased_badges.each do |milestone| %>
+        <div class="flex flex-col items-center gap-1">
+          <% if milestone.icon_filename.present? %>
+            <%= image_tag milestone.icon_filename,
+                          style: "width: 64px; height: 64px;",
+                          alt: milestone.name %>
+          <% end %>
+          <span class="text-xs text-gray-400 text-center max-w-[80px]"><%= milestone.name %></span>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-sm text-gray-400 py-2">No badges collected yet. Reach milestones on your journey to earn pins!</p>
+  <% end %>
+</div>
