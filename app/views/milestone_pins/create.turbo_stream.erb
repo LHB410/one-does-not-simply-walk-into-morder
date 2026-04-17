@@ -1,7 +1,3 @@
-<%= turbo_stream.replace "pin_badges",
-      partial: "dashboard/pin_badges",
-      locals: { current_user: current_user, path: @path } %>
-
 <%= turbo_stream.replace "milestone_popup" do %>
   <turbo-frame id="milestone_popup">
     <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">

@@ -96,11 +96,13 @@ class StepsController < ApplicationController
     unless @active_path
       @pace_estimates = []
       @personal_bests = []
+      @purchased_badges = []
       return
     end
 
     @pace_estimates = helpers.pace_estimates(current_user, @active_path)
     @personal_bests = helpers.personal_bests(current_user, @active_path)
+    @purchased_badges = current_user.purchased_pin_milestones
   end
 
   def update_user_path_progress
