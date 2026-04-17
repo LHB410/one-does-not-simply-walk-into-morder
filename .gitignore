@@ -37,3 +37,7 @@
 !/app/assets/builds/.keep
 
 ./lotr_step_tracker_plan.md
+SCALING_PLAN.md
+
+# Claude Code plans
+.claude/plans/
