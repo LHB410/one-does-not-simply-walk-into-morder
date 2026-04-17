@@ -5,19 +5,24 @@ All notable changes to the Walk to Mordor project.
 ## [1.0.0] - Stats Popup & CI Fixes
 
 ### Added
-- **Stats popup** — "View Stats" button replaces "Daily Step Report" with a tabbed popup containing Daily Steps, Pace Calculator, and Personal Bests
+- **Stats popup** — "View Stats" button replaces "Daily Step Report" with a tabbed popup containing Daily Steps, Pace Calculator, Personal Bests, and Badges Collected
+- **Badges Collected tab** — collected milestone pin badges now display in the stats popup with larger icons instead of on the dashboard
 - **Pace Calculator** — estimates arrival dates for upcoming milestones based on average daily steps
 - **Personal Bests** — shows top 5 step days with gold/silver/bronze styling
 - **bundler-audit** — added gem vulnerability scanning to CI
 - Turbo now loads correctly via importmap (fixed broken Stimulus controllers)
+- CI now builds Tailwind CSS before running tests
 
 ### Changed
+- Moved badge display from dashboard sidebar into the stats popup "Badges" tab
 - CI simplified to: vulnerability audit, rubocop, and rspec
 - Updated Rails from 8.0.2 to 8.0.5 (security patches)
 - Updated nokogiri and rack to resolve CVEs
 
 ### Fixed
 - Removed duplicate `turbo_include_tags` in layout that broke importmap
+- Fixed CI test failures caused by missing Tailwind CSS asset
+- Fixed FitbitClient specs failing in CI due to missing env vars
 
 ## [0.6.0] - Fitbit Catchup Job
 - Added 6 AM catchup sync job to capture same-day Fitbit step updates
