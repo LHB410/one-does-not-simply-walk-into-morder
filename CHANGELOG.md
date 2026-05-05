@@ -2,6 +2,17 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [1.1.1] - Fix Pace Calculator Average
+
+### Fixed
+- Pace calculator now averages steps over total calendar days (including gaps) instead of only days with entries, giving a more realistic pace estimate when users bulk-log steps after missing days
+
+## [1.1.0] - Moria Milestone Badge & Link
+
+### Added
+- Moria milestone badge icon (`moria.svg`)
+- Specific Etsy listing link for Moria enamel pin
+
 ## [1.0.0] - Stats Popup & CI Fixes
 
 ### Added

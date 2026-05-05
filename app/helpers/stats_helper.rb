@@ -24,8 +24,12 @@ module StatsHelper
   private
 
   def average_daily_miles(user, path)
-    avg_steps = DailyStepEntry.where(user: user, path: path).average(:steps)&.to_f
-    avg_steps&.positive? ? avg_steps / Step::STEPS_PER_MILE : nil
+    total_days = DailyStepEntry.total_days_for(user: user, path: path)
+    return nil unless total_days.positive?
+
+    total_steps = DailyStepEntry.where(user: user, path: path).sum(:steps).to_f
+    avg_steps = total_steps / total_days
+    avg_steps.positive? ? avg_steps / Step::STEPS_PER_MILE : nil
   end
 
   def upcoming_milestones(path, user_miles)
