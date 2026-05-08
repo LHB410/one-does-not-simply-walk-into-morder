@@ -27,7 +27,6 @@ RSpec.describe StepsController, type: :controller do
   end
 
   describe "GET #stats" do
-
     it "returns success and renders the stats template" do
       get :stats
       expect(response).to have_http_status(:ok)
