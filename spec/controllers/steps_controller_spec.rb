@@ -8,10 +8,12 @@ RSpec.describe StepsController, type: :controller do
 
   let(:step) { user.step }
 
+  before do
+    Path.remove_instance_variable(:@current_path) if Path.instance_variable_defined?(:@current_path)
+  end
+
   describe "GET #report" do
     it "returns success and renders the daily report partial" do
-      allow(Path).to receive(:current).and_return(active_path)
-
       DailyStepEntry.record!(user: user, path: active_path, date: Date.current, steps: 1234)
 
       get :report
@@ -25,9 +27,6 @@ RSpec.describe StepsController, type: :controller do
   end
 
   describe "GET #stats" do
-    before do
-      allow(Path).to receive(:current).and_return(active_path)
-    end
 
     it "returns success and renders the stats template" do
       get :stats
@@ -54,9 +53,6 @@ RSpec.describe StepsController, type: :controller do
 
   describe "PATCH #update" do
     context "when can update today" do
-      before do
-        allow_any_instance_of(User).to receive(:total_miles).and_return(2)
-      end
       it "adds steps successfully" do
         expect {
           patch :update, params: { id: step.id, steps: 5000 }, format: :json
@@ -72,9 +68,6 @@ RSpec.describe StepsController, type: :controller do
       end
 
       it "updates path progress" do
-        allow_any_instance_of(User).to receive(:total_miles).and_return(400)
-        allow(Path).to receive(:current).and_return(active_path)
-        allow(active_path).to receive(:milestone_for_distance).and_return(rivendell)
         patch :update, params: { id: step.id, steps: 844_800 }, format: :json
         path_user.reload
         expect(path_user.current_milestone).to eq(rivendell)
