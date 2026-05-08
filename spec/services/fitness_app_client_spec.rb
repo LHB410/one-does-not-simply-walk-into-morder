@@ -174,6 +174,13 @@ RSpec.describe FitnessAppClient do
   end
 
   describe ".oauth_client" do
+    before do
+      ENV["FITBIT_CLIENT_ID"] ||= "test_client_id"
+      ENV["FITBIT_CLIENT_SECRET"] ||= "test_client_secret"
+      ENV["FITBIT_AUTH_URL"] ||= "https://www.fitbit.com/oauth2/authorize"
+      ENV["FITBIT_REFRESH_URL"] ||= "https://api.fitbit.com/oauth2/token"
+    end
+
     it "builds an OAuth2 client using the provider's ENV vars" do
       client = FitnessAppClient.oauth_client("fitbit")
       expect(client).to be_a(OAuth2::Client)
