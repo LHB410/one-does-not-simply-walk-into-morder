@@ -135,4 +135,83 @@ RSpec.describe StatsHelper, type: :helper do
       end
     end
   end
+
+  describe "caching behavior" do
+    around do |example|
+      original_store = Rails.cache
+      Rails.cache = ActiveSupport::Cache::MemoryStore.new
+      example.run
+      Rails.cache.clear
+      Rails.cache = original_store
+    end
+
+    def captured_sql
+      queries = []
+      callback = ->(_n, _s, _f, _i, payload) {
+        queries << payload[:sql] if payload[:sql] && payload[:name] != "SCHEMA"
+      }
+      ActiveSupport::Notifications.subscribed(callback, "sql.active_record") { yield }
+      queries
+    end
+
+    describe "#pace_estimates" do
+      before do
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current - 2, steps: 10_000)
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current - 1, steps: 10_000)
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current, steps: 10_000)
+        user.step.update!(total_steps: 30_000)
+      end
+
+      it "returns identical results on consecutive calls" do
+        first = helper.pace_estimates(user, active_path)
+        second = helper.pace_estimates(user, active_path)
+
+        expect(first).not_to be_empty
+        expect(second).to eq(first)
+      end
+
+      it "issues no daily_step_entries SQL on a cache hit" do
+        helper.pace_estimates(user, active_path)
+
+        queries = captured_sql { helper.pace_estimates(user, active_path) }
+
+        expect(queries.any? { |q| q.include?("daily_step_entries") }).to be false
+      end
+
+      it "recomputes after Step#add_steps invalidates the cache" do
+        first = helper.pace_estimates(user, active_path)
+
+        user.step.add_steps(50_000)
+        second = helper.pace_estimates(user, active_path)
+
+        expect(second).not_to eq(first)
+      end
+    end
+
+    describe "#personal_bests" do
+      before do
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current - 4, steps: 5_000)
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current - 3, steps: 15_000)
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current - 2, steps: 8_000)
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current - 1, steps: 20_000)
+        DailyStepEntry.record!(user: user, path: active_path, date: Date.current, steps: 12_000)
+      end
+
+      it "issues no daily_step_entries SQL on a cache hit" do
+        helper.personal_bests(user, active_path)
+
+        queries = captured_sql { helper.personal_bests(user, active_path) }
+
+        expect(queries.any? { |q| q.include?("daily_step_entries") }).to be false
+      end
+
+      it "uses separate cache entries for different limits" do
+        three = helper.personal_bests(user, active_path, limit: 3)
+        five = helper.personal_bests(user, active_path, limit: 5)
+
+        expect(three.length).to eq(3)
+        expect(five.length).to eq(5)
+      end
+    end
+  end
 end
