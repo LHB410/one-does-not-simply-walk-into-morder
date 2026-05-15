@@ -8,6 +8,9 @@ All notable changes to the Walk to Mordor project.
 - Solid Cache wired up as the `Rails.cache` backend in development and production. Uses the primary Postgres database, so no Redis dyno or extra Heroku addon is required.
 - `StatsHelper#pace_estimates` and `#personal_bests` now cache their results per user, keyed off `Step#cache_key_with_version`. The cache invalidates automatically whenever steps are added (via `Step#add_steps`), so the stats popup loads quickly without staleness.
 
+### Changed
+- `Procfile` now runs `rails db:migrate` in the Heroku release phase, so future migrations apply automatically before new dynos take traffic. Failed migrations roll back the deploy.
+
 ## [1.1.1] - Fix Pace Calculator Average
 
 ### Fixed
