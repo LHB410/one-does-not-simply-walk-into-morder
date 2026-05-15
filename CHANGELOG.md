@@ -10,6 +10,7 @@ All notable changes to the Walk to Mordor project.
 
 ### Changed
 - `Procfile` now runs `rails db:migrate` in the Heroku release phase, so future migrations apply automatically before new dynos take traffic. Failed migrations roll back the deploy.
+- Bumped transitive dependencies to resolve CVEs flagged by bundle-audit: `addressable` 2.8.7 → 2.9.0, `net-imap` 0.5.9 → 0.6.4, `nokogiri` 1.19.2 → 1.19.3.
 
 ## [1.1.1] - Fix Pace Calculator Average
 
