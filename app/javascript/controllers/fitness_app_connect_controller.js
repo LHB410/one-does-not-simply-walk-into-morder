@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Updates the Fitbit connect link with the browser's timezone.
+// Updates the fitness app connect link with the browser's timezone.
 export default class extends Controller {
   connect() {
     const link = this.element

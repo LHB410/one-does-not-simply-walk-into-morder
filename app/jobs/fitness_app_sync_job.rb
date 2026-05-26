@@ -1,4 +1,4 @@
-class FitbitSyncJob < ApplicationJob
+class FitnessAppSyncJob < ApplicationJob
   queue_as :default
 
   SYNC_HOUR = 23
@@ -8,10 +8,10 @@ class FitbitSyncJob < ApplicationJob
 
   def perform(user_id, date = nil)
     user = User.find_by(id: user_id)
-    return unless user&.fitbit_connected?
+    return unless user&.fitness_app_connected?
 
     sync_date = date ? Date.parse(date) : Date.current
-    FitbitSyncService.new(user).call(date: sync_date)
+    FitnessAppSyncService.new(user).call(date: sync_date)
 
     schedule_next_run(user) unless date
   end
@@ -45,7 +45,7 @@ class FitbitSyncJob < ApplicationJob
   private
 
   def schedule_next_run(user)
-    return unless user.fitbit_connected?
+    return unless user.fitness_app_connected?
 
     tomorrow = self.class.next_sync_time(user)
     self.class.set(wait_until: tomorrow).perform_later(user.id)

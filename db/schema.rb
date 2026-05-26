@@ -106,12 +106,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_15_020732) do
     t.string "token_color", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "fitbit_uid"
-    t.text "fitbit_access_token"
-    t.text "fitbit_refresh_token"
-    t.datetime "fitbit_token_expires_at"
-    t.datetime "fitbit_last_sync_at"
+    t.string "fitness_app_uid"
+    t.text "fitness_app_access_token"
+    t.text "fitness_app_refresh_token"
+    t.datetime "fitness_app_token_expires_at"
+    t.datetime "fitness_app_last_sync_at"
     t.string "timezone"
+    t.string "fitness_app_provider"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 

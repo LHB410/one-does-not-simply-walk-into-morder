@@ -19,9 +19,9 @@ Rails.application.routes.draw do
   end
   get "milestone_pin/dismiss", to: "milestone_pins#dismiss", as: :dismiss_milestone_popup
 
-  get "auth/fitbit/callback", to: "fitbit#callback", as: :fitbit_callback
-  get "auth/fitbit", to: "fitbit#connect", as: :fitbit_connect
-  delete "auth/fitbit", to: "fitbit#disconnect", as: :fitbit_disconnect
+  get "auth/:provider/callback", to: "fitness_app_connections#callback", as: :fitness_app_callback
+  get "auth/:provider", to: "fitness_app_connections#connect", as: :fitness_app_connect
+  delete "auth/:provider", to: "fitness_app_connections#disconnect", as: :fitness_app_disconnect
 
   # Health check for deployment
   get "up", to: "rails/health#show", as: :rails_health_check

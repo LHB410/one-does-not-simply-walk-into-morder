@@ -41,34 +41,47 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "#fitbit_connected?" do
+  describe "#fitness_app_connected?" do
     let(:user) { create(:user) }
 
-    it "returns true when fitbit_uid is present" do
-      user.update!(fitbit_uid: "ABC123")
-      expect(user.fitbit_connected?).to be true
+    it "returns true when fitness_app_uid is present" do
+      user.update!(fitness_app_uid: "ABC123")
+      expect(user.fitness_app_connected?).to be true
     end
 
-    it "returns false when fitbit_uid is nil" do
-      expect(user.fitbit_connected?).to be false
+    it "returns false when fitness_app_uid is nil" do
+      expect(user.fitness_app_connected?).to be false
     end
   end
 
-  describe "#fitbit_needs_reconnect?" do
+  describe "#fitness_app_needs_reconnect?" do
     let(:user) { create(:user) }
 
     it "returns true when uid is present but access token is blank" do
-      user.update!(fitbit_uid: "ABC123", fitbit_access_token: nil)
-      expect(user.fitbit_needs_reconnect?).to be true
+      user.update!(fitness_app_uid: "ABC123", fitness_app_access_token: nil)
+      expect(user.fitness_app_needs_reconnect?).to be true
     end
 
     it "returns false when fully connected" do
-      user.update!(fitbit_uid: "ABC123", fitbit_access_token: "token")
-      expect(user.fitbit_needs_reconnect?).to be false
+      user.update!(fitness_app_uid: "ABC123", fitness_app_access_token: "token")
+      expect(user.fitness_app_needs_reconnect?).to be false
     end
 
     it "returns false when never connected" do
-      expect(user.fitbit_needs_reconnect?).to be false
+      expect(user.fitness_app_needs_reconnect?).to be false
+    end
+  end
+
+  describe "#fitness_app_provider_name" do
+    let(:user) { create(:user) }
+
+    it "returns titleized provider name" do
+      user.update!(fitness_app_provider: "fitbit")
+      expect(user.fitness_app_provider_name).to eq("Fitbit")
+    end
+
+    it "returns nil when no provider set" do
+      expect(user.fitness_app_provider_name).to be_nil
     end
   end
 

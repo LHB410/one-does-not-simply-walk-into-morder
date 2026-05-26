@@ -16,12 +16,16 @@ class User < ApplicationRecord
 
   delegate :total_miles, to: :step
 
-  def fitbit_connected?
-    fitbit_uid.present?
+  def fitness_app_connected?
+    fitness_app_uid.present?
   end
 
-  def fitbit_needs_reconnect?
-    fitbit_uid.present? && fitbit_access_token.blank?
+  def fitness_app_needs_reconnect?
+    fitness_app_uid.present? && fitness_app_access_token.blank?
+  end
+
+  def fitness_app_provider_name
+    fitness_app_provider&.titleize
   end
 
   def current_position_on_path(path)

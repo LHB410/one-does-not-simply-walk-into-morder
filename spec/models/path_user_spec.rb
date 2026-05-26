@@ -17,8 +17,7 @@ RSpec.describe PathUser, type: :model do
     include_context "user with path progress"
 
     it "updates current milestone based on user miles" do
-      user.step.update(total_steps: 844_800) # 400 miles
-      allow_any_instance_of(User).to receive(:total_miles).and_return(400)
+      user.step.update(total_steps: 844_800) # 400 miles (844800 / 2112)
 
       path_user.update_progress
 
