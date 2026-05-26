@@ -1,24 +1,28 @@
 module StatsHelper
   def pace_estimates(user, path)
-    avg_daily_miles = average_daily_miles(user, path)
-    return [] unless avg_daily_miles&.positive?
+    Rails.cache.fetch([ "stats/pace_estimates", user.step.cache_key_with_version, path.cache_key ]) do
+      avg_daily_miles = average_daily_miles(user, path)
+      next [] unless avg_daily_miles&.positive?
 
-    user_miles = user.step.total_miles
+      user_miles = user.step.total_miles
 
-    upcoming_milestones(path, user_miles).map do |milestone|
-      miles_away = milestone.cumulative_distance_miles - user_miles
-      days_away = (miles_away / avg_daily_miles).ceil
+      upcoming_milestones(path, user_miles).map do |milestone|
+        miles_away = milestone.cumulative_distance_miles - user_miles
+        days_away = (miles_away / avg_daily_miles).ceil
 
-      { name: milestone.name, miles_away: miles_away.round(1), estimated_date: Date.current + days_away }
+        { name: milestone.name, miles_away: miles_away.round(1), estimated_date: Date.current + days_away }
+      end
     end
   end
 
   def personal_bests(user, path, limit: 5)
-    DailyStepEntry
-      .where(user: user, path: path)
-      .order(steps: :desc)
-      .limit(limit)
-      .map { |entry| { date: entry.date, steps: entry.steps, miles: steps_to_miles(entry.steps) } }
+    Rails.cache.fetch([ "stats/personal_bests", user.step.cache_key_with_version, path.cache_key, limit ]) do
+      DailyStepEntry
+        .where(user: user, path: path)
+        .order(steps: :desc)
+        .limit(limit)
+        .map { |entry| { date: entry.date, steps: entry.steps, miles: steps_to_miles(entry.steps) } }
+    end
   end
 
   private
