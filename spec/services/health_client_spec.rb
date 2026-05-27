@@ -192,6 +192,12 @@ RSpec.describe HealthClient do
   end
 
   describe ".authorize_url" do
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with("GOOGLE_CLIENT_ID").and_return("test-client-id")
+      allow(ENV).to receive(:fetch).with("GOOGLE_CLIENT_SECRET").and_return("test-client-secret")
+    end
+
     it "builds a Google consent URL requesting offline access" do
       url = described_class.authorize_url(redirect_uri: "https://example.com/auth/health/callback", state: "xyz")
 
