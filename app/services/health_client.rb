@@ -1,6 +1,8 @@
 require "signet/oauth_2/client"
 
 class HealthClient
+  include Loggable
+
   API_BASE = "https://health.googleapis.com".freeze
   AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth".freeze
   TOKEN_URL = "https://oauth2.googleapis.com/token".freeze
@@ -62,22 +64,29 @@ class HealthClient
   def fetch_steps(date = Date.current)
     refresh_token_if_needed!
     response = request_steps(date)
-
-    if response.status == 401
-      Rails.logger.info("Google Health 401 for user #{@user.id}, forcing token refresh and retrying")
-      force_refresh_token!
-      response = request_steps(date)
-    end
-
-    unless response.success?
-      Rails.logger.error("Google Health API error for user #{@user.id}: HTTP #{response.status} — #{response.body.truncate(200)}")
-      raise ApiError, "Google Health API returned HTTP #{response.status}"
-    end
-
+    response = retry_after_refresh(date) if unauthorized?(response)
+    ensure_successful!(response)
     parse_steps(response.body)
   end
 
   private
+
+  def unauthorized?(response)
+    response.status == 401
+  end
+
+  def retry_after_refresh(date)
+    log(:info, "Google Health 401 for user #{@user.id}, forcing token refresh and retrying")
+    force_refresh_token!
+    request_steps(date)
+  end
+
+  def ensure_successful!(response)
+    return if response.success?
+
+    log(:error, "Google Health API error for user #{@user.id}: HTTP #{response.status} — #{response.body.truncate(200)}")
+    raise ApiError, "Google Health API returned HTTP #{response.status}"
+  end
 
   def request_steps(date)
     connection.post("/v4/users/me/dataTypes/steps/dataPoints:dailyRollUp") do |req|
@@ -123,7 +132,7 @@ class HealthClient
       health_token_expires_at: client.expires_at
     )
   rescue Signet::AuthorizationError => e
-    Rails.logger.error("Google Health token refresh failed for user #{@user.id}: #{e.message}")
+    log(:error, "Google Health token refresh failed for user #{@user.id}: #{e.message}")
     @user.update!(health_access_token: nil, health_refresh_token: nil,
                   health_token_expires_at: nil)
     raise TokenRefreshError, "Token refresh failed — please reconnect Google Health."

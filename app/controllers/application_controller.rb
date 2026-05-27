@@ -1,5 +1,7 @@
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::Base
+  include Loggable
+
   helper_method :current_user, :logged_in?
 
   def current_user

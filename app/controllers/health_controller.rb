@@ -31,7 +31,7 @@ class HealthController < ApplicationController
 
     redirect_to root_path, notice: "Google Health connected!"
   rescue Signet::AuthorizationError, HealthClient::ApiError => e
-    Rails.logger.error("Google Health OAuth failed: #{e.message}")
+    log(:error, "Google Health OAuth failed: #{e.message}")
     redirect_to root_path, alert: "Failed to connect Google Health"
   end
 
