@@ -2,6 +2,11 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [1.2.1] - Remove Golden Ring Around User Token
+
+### Removed
+- The golden ring that was drawn around the current user's map token when parked on a milestone with a shop URL. The milestone pin is no longer clickable, so the ring served no purpose and lingered (preserved by `data-turbo-permanent`) even after the pin was collected.
+
 ## [1.2.0] - Cache User Stats with Solid Cache
 
 ### Added
