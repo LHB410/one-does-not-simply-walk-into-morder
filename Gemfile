@@ -23,7 +23,7 @@ gem "jbuilder"
 gem "bcrypt", "~> 3.1.7"
 
 # Background jobs
-gem "sidekiq", "~> 7.0"
+gem "sidekiq", "~> 8.1"
 
 gem "googleauth"
 gem "faraday"
