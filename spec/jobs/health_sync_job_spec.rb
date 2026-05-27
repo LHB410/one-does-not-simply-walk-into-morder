@@ -1,48 +1,48 @@
 require 'rails_helper'
 
-RSpec.describe FitbitSyncJob, type: :job do
+RSpec.describe HealthSyncJob, type: :job do
   include ActiveSupport::Testing::TimeHelpers
   include_context "user with path progress"
 
   before do
-    user.update!(fitbit_uid: "TESTUID", fitbit_access_token: "token123", timezone: "America/New_York")
+    user.update!(health_uid: "TESTUID", health_access_token: "token123", timezone: "America/New_York")
   end
 
   describe "#perform" do
-    it "calls FitbitSyncService for the user" do
-      sync_service = instance_double(FitbitSyncService, call: true)
-      allow(FitbitSyncService).to receive(:new).with(user).and_return(sync_service)
+    it "calls HealthSyncService for the user" do
+      sync_service = instance_double(HealthSyncService, call: true)
+      allow(HealthSyncService).to receive(:new).with(user).and_return(sync_service)
 
       described_class.new.perform(user.id)
 
       expect(sync_service).to have_received(:call).with(date: Date.current)
     end
 
-    it "passes the date to FitbitSyncService when provided" do
+    it "passes the date to HealthSyncService when provided" do
       yesterday = (Date.current - 1).to_s
-      sync_service = instance_double(FitbitSyncService, call: true)
-      allow(FitbitSyncService).to receive(:new).with(user).and_return(sync_service)
+      sync_service = instance_double(HealthSyncService, call: true)
+      allow(HealthSyncService).to receive(:new).with(user).and_return(sync_service)
 
       described_class.new.perform(user.id, yesterday)
 
       expect(sync_service).to have_received(:call).with(date: Date.parse(yesterday))
     end
 
-    it "skips users who have disconnected Fitbit" do
-      user.update!(fitbit_uid: nil)
+    it "skips users who have disconnected" do
+      user.update!(health_uid: nil)
 
-      expect(FitbitSyncService).not_to receive(:new)
+      expect(HealthSyncService).not_to receive(:new)
 
       described_class.new.perform(user.id)
     end
 
     it "does nothing for non-existent user IDs" do
-      expect(FitbitSyncService).not_to receive(:new)
+      expect(HealthSyncService).not_to receive(:new)
       described_class.new.perform(-1)
     end
 
     it "reschedules nightly sync and catchup after a nightly run" do
-      allow(FitbitSyncService).to receive_message_chain(:new, :call).and_return(true)
+      allow(HealthSyncService).to receive_message_chain(:new, :call).and_return(true)
 
       expect {
         described_class.new.perform(user.id)
@@ -50,15 +50,15 @@ RSpec.describe FitbitSyncJob, type: :job do
     end
 
     it "does not reschedule after a catchup run" do
-      allow(FitbitSyncService).to receive_message_chain(:new, :call).and_return(true)
+      allow(HealthSyncService).to receive_message_chain(:new, :call).and_return(true)
 
       expect {
         described_class.new.perform(user.id, Date.current.to_s)
       }.not_to have_enqueued_job(described_class)
     end
 
-    it "does not reschedule if user disconnected Fitbit" do
-      user.update!(fitbit_uid: nil)
+    it "does not reschedule if user disconnected" do
+      user.update!(health_uid: nil)
 
       expect {
         described_class.new.perform(user.id)
@@ -66,8 +66,8 @@ RSpec.describe FitbitSyncJob, type: :job do
     end
 
     it "still reschedules when tokens are expired but uid exists" do
-      user.update!(fitbit_access_token: nil, fitbit_refresh_token: nil, fitbit_token_expires_at: nil)
-      allow_any_instance_of(FitbitSyncService).to receive(:call).and_return(false)
+      user.update!(health_access_token: nil, health_refresh_token: nil, health_token_expires_at: nil)
+      allow_any_instance_of(HealthSyncService).to receive(:call).and_return(false)
 
       expect {
         described_class.new.perform(user.id)

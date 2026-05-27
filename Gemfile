@@ -25,7 +25,7 @@ gem "bcrypt", "~> 3.1.7"
 # Background jobs
 gem "sidekiq", "~> 7.0"
 
-gem "oauth2"
+gem "googleauth"
 gem "faraday"
 
 

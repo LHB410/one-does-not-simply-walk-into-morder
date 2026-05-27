@@ -1,6 +1,10 @@
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::Base
+  include Loggable
+
   helper_method :current_user, :logged_in?
+
+  private
 
   def current_user
     @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]

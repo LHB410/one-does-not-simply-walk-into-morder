@@ -1,4 +1,6 @@
 class Step < ApplicationRecord
+  include Loggable
+
   belongs_to :user
   validates :total_steps, :steps_today, :steps_until_mordor,
             :steps_until_next_milestone, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -48,7 +50,7 @@ class Step < ApplicationRecord
     end
     true
   rescue ActiveRecord::ActiveRecordError => e
-    Rails.logger.error("Failed to add steps: #{e.class} - #{e.message}")
+    log(:error, "Failed to add steps: #{e.class} - #{e.message}")
     false
   end
 
