@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_15_020732) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_27_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -106,11 +106,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_15_020732) do
     t.string "token_color", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "fitbit_uid"
-    t.text "fitbit_access_token"
-    t.text "fitbit_refresh_token"
-    t.datetime "fitbit_token_expires_at"
-    t.datetime "fitbit_last_sync_at"
+    t.string "health_uid"
+    t.text "health_access_token"
+    t.text "health_refresh_token"
+    t.datetime "health_token_expires_at"
+    t.datetime "health_last_sync_at"
     t.string "timezone"
     t.index ["email"], name: "index_users_on_email", unique: true
   end

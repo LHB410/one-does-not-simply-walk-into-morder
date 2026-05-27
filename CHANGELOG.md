@@ -2,6 +2,18 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [2.0.0] - Replace Fitbit with Google Health API
+
+### Changed
+- Step sync now uses the **Google Health API** instead of the Fitbit Web API. The integration is provider-neutral: `HealthClient`, `HealthSyncService`, `HealthSyncJob`, and `HealthController` replace their `Fitbit*` counterparts, and the `users.fitbit_*` columns were renamed to `health_*`.
+- OAuth now uses Google's official `Signet::OAuth2::Client` (via the `googleauth` gem) for the token lifecycle; the `oauth2` gem was dropped. Step data is read over Faraday from the `dailyRollUp` endpoint.
+
+### Removed
+- All Fitbit code, routes (`/auth/fitbit*` → `/auth/health*`), the Fitbit Stimulus controller, and the `FITBIT_*` environment variables (now `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`).
+
+### Migration notes
+- Google does not accept transferred Fitbit tokens, so stored token values are cleared on migrate. Each user must reconnect once via **Connect Google Health**. Step history (`steps`, `daily_step_entries`, `path_users`) is preserved untouched.
+
 ## [1.2.1] - Remove Golden Ring Around User Token
 
 ### Removed

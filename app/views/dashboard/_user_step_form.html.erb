@@ -108,39 +108,39 @@
     </p>
   <% end %>
 
-  <!-- Fitbit -->
+  <!-- Google Health -->
   <% if is_current_user %>
     <div class="mt-3 pt-3 border-t border-gray-700">
-      <% if user.fitbit_needs_reconnect? %>
+      <% if user.health_needs_reconnect? %>
         <div class="bg-red-900 bg-opacity-30 border border-red-700 rounded-md p-3 mb-2">
           <div class="flex items-center gap-2 mb-2">
             <span class="inline-block w-2 h-2 bg-red-400 rounded-full"></span>
-            <span class="text-xs text-red-300 font-semibold">Fitbit session expired</span>
+            <span class="text-xs text-red-300 font-semibold">Google Health session expired</span>
           </div>
-          <%= link_to fitbit_connect_path,
-            id: "fitbit-connect-link",
-            data: { controller: "fitbit-connect" },
+          <%= link_to health_connect_path,
+            id: "health-connect-link",
+            data: { controller: "health-connect" },
             class: "block w-full py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md text-center transition-colors duration-200" do %>
-            Reconnect Fitbit
+            Reconnect Google Health
           <% end %>
         </div>
-      <% elsif user.fitbit_connected? %>
+      <% elsif user.health_connected? %>
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="inline-block w-2 h-2 bg-green-400 rounded-full"></span>
-            <span class="text-xs text-gray-400">Fitbit synced</span>
-            <% if user.fitbit_last_sync_at %>
-              <span class="text-xs text-gray-500"><%= time_ago_in_words(user.fitbit_last_sync_at) %> ago</span>
+            <span class="text-xs text-gray-400">Google Health synced</span>
+            <% if user.health_last_sync_at %>
+              <span class="text-xs text-gray-500"><%= time_ago_in_words(user.health_last_sync_at) %> ago</span>
             <% end %>
           </div>
-          <%= link_to "Disconnect", fitbit_disconnect_path, data: { turbo_method: :delete, turbo_confirm: "Disconnect Fitbit?" }, class: "text-xs text-red-400 hover:text-red-300" %>
+          <%= link_to "Disconnect", health_disconnect_path, data: { turbo_method: :delete, turbo_confirm: "Disconnect Google Health?" }, class: "text-xs text-red-400 hover:text-red-300" %>
         </div>
       <% else %>
-        <%= link_to fitbit_connect_path,
-          id: "fitbit-connect-link",
-          data: { controller: "fitbit-connect" },
+        <%= link_to health_connect_path,
+          id: "health-connect-link",
+          data: { controller: "health-connect" },
           class: "block w-full py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md text-center transition-colors duration-200" do %>
-          Connect Fitbit
+          Connect Google Health
         <% end %>
       <% end %>
     </div>
