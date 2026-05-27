@@ -7,6 +7,9 @@ All notable changes to the Walk to Mordor project.
 ### Removed
 - The golden ring that was drawn around the current user's map token when parked on a milestone with a shop URL. The milestone pin is no longer clickable, so the ring served no purpose and lingered (preserved by `data-turbo-permanent`) even after the pin was collected.
 
+### Changed
+- Bumped dependencies to resolve CVEs flagged by bundle-audit: `faraday` 2.14.1 → 2.14.2 (GHSA-5rv5-xj5j-3484), `jwt` 3.1.2 → 3.2.0 (CVE-2026-45363, High).
+
 ## [1.2.0] - Cache User Stats with Solid Cache
 
 ### Added
