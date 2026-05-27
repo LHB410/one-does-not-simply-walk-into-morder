@@ -95,7 +95,8 @@ class HealthClient
     end
   end
 
-  # Closed-open civil-time range covering the single target day.
+  # Asks for one day of steps: from the target date up to (not including) the
+  # next day. The end is exclusive, so next_day gives exactly the target day.
   def rollup_body(date)
     next_day = date.next_day
     {

@@ -8,6 +8,9 @@ All notable changes to the Walk to Mordor project.
 - Step sync now uses the **Google Health API** instead of the Fitbit Web API. The integration is provider-neutral: `HealthClient`, `HealthSyncService`, `HealthSyncJob`, and `HealthController` replace their `Fitbit*` counterparts, and the `users.fitbit_*` columns were renamed to `health_*`.
 - OAuth now uses Google's official `Signet::OAuth2::Client` (via the `googleauth` gem) for the token lifecycle; the `oauth2` gem was dropped. Step data is read over Faraday from the `dailyRollUp` endpoint.
 
+### Added
+- Shared `Loggable` mixin (`app/lib/loggable.rb`) providing a terse `log(level, message)` wrapper over `Rails.logger`. Included across services, controllers, and models so all logging goes through one helper.
+
 ### Removed
 - All Fitbit code, routes (`/auth/fitbit*` → `/auth/health*`), the Fitbit Stimulus controller, and the `FITBIT_*` environment variables (now `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`).
 
