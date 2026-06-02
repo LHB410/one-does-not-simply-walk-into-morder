@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_27_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_02_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,6 +24,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_000001) do
     t.index ["path_id"], name: "index_daily_step_entries_on_path_id"
     t.index ["user_id", "path_id", "date"], name: "index_daily_step_entries_on_user_path_date", unique: true
     t.index ["user_id"], name: "index_daily_step_entries_on_user_id"
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "password_digest", null: false
+    t.bigint "leader_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["leader_id"], name: "index_groups_on_leader_id"
   end
 
   create_table "milestone_pin_purchases", force: :cascade do |t|
@@ -100,8 +109,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_000001) do
 
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
-    t.string "email", null: false
-    t.string "password_digest", null: false
+    t.text "email", null: false
+    t.string "password_digest"
     t.boolean "admin", default: false
     t.string "token_color", null: false
     t.datetime "created_at", null: false
@@ -112,11 +121,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_000001) do
     t.datetime "health_token_expires_at"
     t.datetime "health_last_sync_at"
     t.string "timezone"
+    t.bigint "group_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["group_id"], name: "index_users_on_group_id"
   end
 
   add_foreign_key "daily_step_entries", "paths"
   add_foreign_key "daily_step_entries", "users"
+  add_foreign_key "groups", "users", column: "leader_id", on_delete: :nullify
   add_foreign_key "milestone_pin_purchases", "milestones"
   add_foreign_key "milestone_pin_purchases", "users"
   add_foreign_key "milestones", "paths"
@@ -124,4 +136,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_000001) do
   add_foreign_key "path_users", "paths"
   add_foreign_key "path_users", "users"
   add_foreign_key "steps", "users"
+  add_foreign_key "users", "groups"
 end

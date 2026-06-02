@@ -1,0 +1,114 @@
+<%# app/views/registrations/new.html.erb %>
+<div class="min-h-screen bg-stone-900 flex items-center justify-center p-4">
+  <div class="bg-stone-800 rounded-lg shadow-2xl p-8 max-w-lg w-full border-4 border-yellow-600">
+    <div class="text-center mb-6">
+      <h2 class="text-3xl font-bold text-yellow-500 mb-2" style="font-family: 'Cinzel', serif;">
+        Form Your Fellowship
+      </h2>
+      <p class="text-gray-300 text-sm italic">
+        "One does not simply walk into Mordor &mdash; gather your companions."
+      </p>
+    </div>
+
+    <% if @error.present? %>
+      <%= render "sessions/error", error: @error %>
+    <% end %>
+
+    <% input_classes = "w-full px-4 py-2 bg-stone-700 border border-yellow-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500" %>
+    <% label_classes = "block text-sm font-medium text-gray-300 mb-1" %>
+
+    <%= simple_form_for :registration,
+                        url: sign_up_path,
+                        method: :post,
+                        html: { data: { turbo: true } } do |f| %>
+
+      <h3 class="text-yellow-500 font-semibold mb-2">Your Fellowship</h3>
+
+      <%= f.input :group_name,
+          label: "Group name",
+          required: true,
+          input_html: { value: @registration&.dig(:group_name), class: input_classes },
+          wrapper_html: { class: "mb-4" },
+          label_html: { class: label_classes } %>
+
+      <h3 class="text-yellow-500 font-semibold mb-2 mt-6">You (Group Leader)</h3>
+
+      <%= f.input :leader_name,
+          label: "Your name",
+          required: true,
+          input_html: { value: @registration&.dig(:leader_name), class: input_classes },
+          wrapper_html: { class: "mb-4" },
+          label_html: { class: label_classes } %>
+
+      <%= f.input :leader_email,
+          label: "Your email",
+          required: true,
+          input_html: { value: @registration&.dig(:leader_email), type: "email", class: input_classes },
+          wrapper_html: { class: "mb-4" },
+          label_html: { class: label_classes } %>
+
+      <h3 class="text-yellow-500 font-semibold mb-2 mt-6">Your Companions</h3>
+      <p class="text-gray-400 text-xs mb-3">Add the members of your fellowship. They'll log in with their email and the shared group password you set below.</p>
+
+      <div data-controller="members">
+        <div data-members-target="list">
+          <% member_rows = (@registration && @registration[:members].presence) || [ {}, {} ] %>
+          <% member_rows.each do |row| %>
+            <div class="flex gap-2 mb-2 items-start" data-members-row>
+              <input type="text" name="registration[members][][name]"
+                     value="<%= row[:name] %>" placeholder="Name"
+                     class="<%= input_classes %>">
+              <input type="email" name="registration[members][][email]"
+                     value="<%= row[:email] %>" placeholder="email@shire.me"
+                     class="<%= input_classes %>">
+              <button type="button" data-action="members#remove"
+                      class="px-3 py-2 text-red-400 hover:text-red-300 font-bold" aria-label="Remove member">&times;</button>
+            </div>
+          <% end %>
+        </div>
+
+        <template data-members-target="template">
+          <div class="flex gap-2 mb-2 items-start" data-members-row>
+            <input type="text" name="registration[members][][name]" placeholder="Name"
+                   class="<%= input_classes %>">
+            <input type="email" name="registration[members][][email]" placeholder="email@shire.me"
+                   class="<%= input_classes %>">
+            <button type="button" data-action="members#remove"
+                    class="px-3 py-2 text-red-400 hover:text-red-300 font-bold" aria-label="Remove member">&times;</button>
+          </div>
+        </template>
+
+        <button type="button" data-action="members#add"
+                class="mt-1 text-sm text-yellow-500 hover:text-yellow-400 font-medium">
+          + Add another companion
+        </button>
+      </div>
+
+      <h3 class="text-yellow-500 font-semibold mb-2 mt-6">Shared Group Password</h3>
+      <p class="text-gray-400 text-xs mb-3">All members log in with this password. Only you, the leader, can change it later. At least 8 characters.</p>
+
+      <%= f.input :group_password,
+          label: "Group password",
+          required: true,
+          input_html: { type: "password", class: input_classes },
+          wrapper_html: { class: "mb-4" },
+          label_html: { class: label_classes } %>
+
+      <%= f.input :group_password_confirmation,
+          label: "Confirm group password",
+          required: true,
+          input_html: { type: "password", class: input_classes },
+          wrapper_html: { class: "mb-6" },
+          label_html: { class: label_classes } %>
+
+      <%= f.button :submit,
+          "Begin the Quest",
+          class: "w-full py-3 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+    <% end %>
+
+    <div class="mt-6 text-center text-sm text-gray-400">
+      Already on the journey?
+      <%= link_to "Log in", root_path, class: "text-yellow-500 hover:text-yellow-400 font-medium" %>
+    </div>
+  </div>
+</div>

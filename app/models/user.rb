@@ -1,5 +1,17 @@
 class User < ApplicationRecord
-  has_secure_password
+  # validations: false because group members have no individual password (they
+  # authenticate against their group's shared password, so password_digest is
+  # nil). We keep password=/authenticate and own the presence rule below.
+  has_secure_password validations: false
+
+  belongs_to :group, optional: true
+
+  # PII encryption at rest (no plaintext in DB/backups/logs).
+  # deterministic: true keeps find_by(email:) and the unique index working;
+  # downcase: true normalizes case (deterministic encryption is exact-match).
+  encrypts :email, deterministic: true, downcase: true
+  encrypts :health_access_token
+  encrypts :health_refresh_token
 
   has_one :step, dependent: :destroy
   has_many :path_users, dependent: :destroy
@@ -11,10 +23,22 @@ class User < ApplicationRecord
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :token_color, presence: true
+  # Non-group accounts (admin/legacy, created manually) still set their own
+  # password. Group members are exempt; runs only on create so existing rows
+  # are never re-validated.
+  validates :password, presence: true, on: :create, unless: :group_member?
 
   after_create :create_associated_step
 
   delegate :total_miles, to: :step
+
+  def group_member?
+    group_id.present?
+  end
+
+  def group_leader?
+    group_id.present? && group&.leader_id == id
+  end
 
   def health_connected?
     health_uid.present?

@@ -1,5 +1,5 @@
-<% if @show_login_modal %>
-  <%= render 'sessions/login_modal' %>
+<% unless logged_in? %>
+  <%= render 'dashboard/entry_choices' %>
 <% end %>
 
 <div class="flex flex-col h-screen md:flex-row">

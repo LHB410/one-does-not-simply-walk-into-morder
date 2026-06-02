@@ -5,6 +5,11 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
+  get "sign_up", to: "registrations#new", as: :sign_up
+  post "sign_up", to: "registrations#create"
+
+  patch "group/password", to: "groups#update_password", as: :group_password
+
   get "steps/report", to: "steps#report", as: :steps_report
   get "steps/stats", to: "steps#stats", as: :steps_stats
 

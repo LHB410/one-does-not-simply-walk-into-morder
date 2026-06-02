@@ -22,5 +22,19 @@ RSpec.describe DashboardController, type: :controller do
         expect(response).to have_http_status(:success)
       end
     end
+
+    context "when logged out" do
+      render_views
+      before { session[:user_id] = nil }
+
+      it "presents the sign up and log in choices" do
+        get :index
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include("Sign up")
+        expect(response.body).to include("Log in")
+        expect(response.body).to include(sign_up_path)
+      end
+    end
   end
 end

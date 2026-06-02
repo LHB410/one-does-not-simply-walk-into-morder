@@ -5,7 +5,10 @@ class SessionsController < ApplicationController
     email = credentials[:email]
     password = credentials[:password]
     user = User.find_by(email: email)
-    if user&.authenticate(password)
+    # Group members authenticate against their group's shared password; everyone
+    # else (admin/legacy) authenticates against their own.
+    authenticated = user&.group ? user.group.authenticate(password) : user&.authenticate(password)
+    if authenticated
       session[:user_id] = user.id
       respond_to do |format|
         # Force a full page visit so content conditioned on logged_in? re-renders
