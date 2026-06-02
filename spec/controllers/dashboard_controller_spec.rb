@@ -6,9 +6,10 @@ RSpec.describe DashboardController, type: :controller do
       include_context "authenticated user"
       include_context "active path with milestones"
 
+      # Ensure Path.current returns the active_path we created.
+      before { allow(Path).to receive(:current).and_return(active_path) }
+
       it "loads users and active path" do
-        # Ensure Path.current returns the active_path we created
-        allow(Path).to receive(:current).and_return(active_path)
         get :index
 
         expect(assigns(:users)).to be_present

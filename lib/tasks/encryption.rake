@@ -1,4 +1,23 @@
 namespace :encryption do
+  # Pre-deploy safety check. Run against a prod snapshot (or `heroku run`)
+  # BEFORE backfilling. Exits non-zero if email case-collisions would break the
+  # backfill, so it can gate a deploy script.
+  desc "Pre-deploy check: counts + email case-collisions before backfill"
+  task preflight: :environment do
+    report = EncryptionPreflight.report
+    puts "Users: #{report[:users]}"
+    puts "Steps: #{report[:steps]}"
+
+    collisions = report[:email_case_collisions]
+    if collisions.empty?
+      puts "Email case-collisions: none — safe to backfill."
+    else
+      puts "Email case-collisions found (#{collisions.size}) — RESOLVE BEFORE BACKFILL:"
+      collisions.each { |ids| puts "  user ids #{ids.join(', ')} share an email once downcased" }
+      abort "Preflight failed: resolve duplicate emails before encrypting."
+    end
+  end
+
   # One-off backfill to convert existing plaintext user PII (email + health
   # OAuth tokens) into encrypted form at rest. Active Record Encryption does NOT
   # rewrite existing rows automatically; this forces each row through encryption.
