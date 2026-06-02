@@ -24,6 +24,30 @@ RSpec.describe DashboardController, type: :controller do
       end
     end
 
+    context "rendering members' step cards as a non-admin group leader" do
+      render_views
+      include_context "active path with milestones"
+
+      before { allow(Path).to receive(:current).and_return(active_path) }
+
+      it "does not falsely claim a teammate's steps are already updated, nor expose an edit form" do
+        group = create(:group)
+        leader = create(:user, :group_member, group: group)
+        group.update!(leader: leader)
+        create(:user, :group_member, group: group) # teammate who has entered no steps
+
+        session[:user_id] = leader.id
+        get :index
+
+        # The teammate hasn't updated, and a non-admin can't edit another member,
+        # so there should be no "already updated" message and no admin edit form.
+        expect(response.body).not_to include("already updated")
+        expect(response.body).not_to include("admin_update")
+        # The leader still gets their own editable form.
+        expect(response.body).to include("Update Steps")
+      end
+    end
+
     context "when logged in as a group member" do
       it "only loads users from the same group (no cross-group leakage)" do
         group = create(:group)

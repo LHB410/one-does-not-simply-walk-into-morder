@@ -54,7 +54,8 @@
     </p>
   </div>
 
-  <!-- Step Input Form -->
+  <!-- Step Input Form: only the user themselves, or an admin, can edit steps. -->
+  <% if is_current_user || current_user.admin? %>
   <% can_update = is_current_user ? step.can_update_today? : current_user.admin? %>
 
   <%= simple_form_for step,
@@ -86,11 +87,7 @@
           class: "w-full py-2 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
     <% else %>
       <div class="w-full py-2 px-4 bg-gray-700 text-gray-400 font-semibold rounded-md text-center text-sm">
-        <% if is_current_user %>
-          Steps already updated today
-        <% else %>
-          <%= user.name %>'s steps already updated
-        <% end %>
+        Steps already updated today
       </div>
     <% end %>
 
@@ -99,6 +96,7 @@
         Admin Override Enabled
       </p>
     <% end %>
+  <% end %>
   <% end %>
 
   <!-- Last Updated -->
