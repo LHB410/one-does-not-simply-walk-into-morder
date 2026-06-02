@@ -22,8 +22,7 @@ gem "jbuilder"
 # Authentication
 gem "bcrypt", "~> 3.1.7"
 
-# Background jobs
-gem "sidekiq", "~> 7.0"
+# Background jobs run on Solid Queue (see config.active_job.queue_adapter = :solid_queue)
 
 gem "googleauth"
 gem "faraday"

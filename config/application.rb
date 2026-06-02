@@ -17,6 +17,20 @@ module OneDoesNotSimplyWalkIntoMorder
     # Ignore clock.rb - it's a standalone clockwork config file, not a Rails module
     config.autoload_lib(ignore: %w[assets tasks clock.rb])
 
+    # Active Record Encryption keys are read from the environment (dotenv in
+    # dev/test, Heroku config vars in production) rather than Rails credentials.
+    config.active_record.encryption.primary_key = ENV["AR_ENCRYPTION_PRIMARY_KEY"]
+    config.active_record.encryption.deterministic_key = ENV["AR_ENCRYPTION_DETERMINISTIC_KEY"]
+    config.active_record.encryption.key_derivation_salt = ENV["AR_ENCRYPTION_KEY_DERIVATION_SALT"]
+
+    # Transition flags for migrating an existing plaintext database to encrypted.
+    # Keep false normally; set both true only during the backfill window (see
+    # lib/tasks/encryption.rake), then back to false.
+    config.active_record.encryption.support_unencrypted_data =
+      ActiveModel::Type::Boolean.new.cast(ENV.fetch("AR_ENCRYPTION_SUPPORT_UNENCRYPTED", "false"))
+    config.active_record.encryption.extend_queries =
+      ActiveModel::Type::Boolean.new.cast(ENV.fetch("AR_ENCRYPTION_EXTEND_QUERIES", "false"))
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

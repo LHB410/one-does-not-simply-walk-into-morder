@@ -6,6 +6,19 @@ class PathUser < ApplicationRecord
 
   validates :user_id, uniqueness: { scope: :path_id }
 
+  # Place a user at the start of a path (first milestone, zero progress). Shared
+  # by sign-up (GroupRegistration) and the seeds so the "join a path" rule lives
+  # in one place. No-op when there is no active path.
+  def self.start_for(user, path)
+    return unless path
+
+    user.path_users.create!(
+      path: path,
+      current_milestone: path.milestones.first,
+      progress_percentage: 0.0
+    )
+  end
+
   def update_progress(active_path = nil)
     active_path ||= path
     user_miles = user.step.total_steps / Step::STEPS_PER_MILE.to_f

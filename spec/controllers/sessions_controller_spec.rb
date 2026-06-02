@@ -33,6 +33,31 @@ RSpec.describe SessionsController, type: :controller do
         expect(flash[:alert]).to be_present
       end
     end
+
+    context "for a group member" do
+      let(:group) { create(:group, password: 'speak-friend', password_confirmation: 'speak-friend') }
+      let(:member) { create(:user, :group_member, group: group, email: 'samwise@shire.me') }
+
+      before { session[:user_id] = nil }
+
+      it "logs in with the group's shared password" do
+        post :create, params: { session: { email: member.email, password: 'speak-friend' } }
+
+        expect(session[:user_id]).to eq(member.id)
+      end
+
+      it "does not log in with an incorrect group password" do
+        post :create, params: { session: { email: member.email, password: 'orc-speak' } }
+
+        expect(session[:user_id]).to be_nil
+      end
+
+      it "does not authenticate against an individual password (members have none)" do
+        post :create, params: { session: { email: member.email, password: 'password123' } }
+
+        expect(session[:user_id]).to be_nil
+      end
+    end
   end
 
   describe "DELETE #destroy" do

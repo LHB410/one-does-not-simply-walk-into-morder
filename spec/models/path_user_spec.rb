@@ -13,6 +13,28 @@ RSpec.describe PathUser, type: :model do
     it { should validate_uniqueness_of(:user_id).scoped_to(:path_id) }
   end
 
+  describe ".start_for" do
+    include_context "active path with milestones"
+
+    it "creates a starting position at the first milestone with zero progress" do
+      user = create(:user)
+
+      position = described_class.start_for(user, active_path)
+
+      expect(position).to be_persisted
+      expect(position.path).to eq(active_path)
+      expect(position.current_milestone).to eq(shire)
+      expect(position.progress_percentage).to eq(0.0)
+    end
+
+    it "does nothing and returns nil when there is no active path" do
+      user = create(:user)
+
+      expect { @result = described_class.start_for(user, nil) }.not_to change(PathUser, :count)
+      expect(@result).to be_nil
+    end
+  end
+
   describe "#update_progress" do
     include_context "user with path progress"
 

@@ -76,13 +76,8 @@ users_data.each do |user_data|
     token_color: user_data[:color]
   )
 
-  # Create path association
-  PathUser.create!(
-    user: user,
-    path: journey,
-    current_milestone: journey.milestones.first,
-    progress_percentage: 0.0
-  )
+  # Place the user at the start of the journey (shared with sign-up).
+  PathUser.start_for(user, journey)
 
   puts "Created user: #{user.name} (#{user.email})"
 end
