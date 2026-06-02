@@ -56,47 +56,47 @@
 
   <!-- Step Input Form: only the user themselves, or an admin, can edit steps. -->
   <% if is_current_user || current_user.admin? %>
-  <% can_update = is_current_user ? step.can_update_today? : current_user.admin? %>
+    <% can_update = is_current_user ? step.can_update_today? : current_user.admin? %>
 
-  <%= simple_form_for step,
-                      url: is_current_user ? step_path(step) : admin_update_step_path(step),
-                      method: :patch,
-                      html: {
-                        data: {
-                          turbo: false,
-                          step_form_target: "form"
-                        }
-                      } do |f| %>
+    <%= simple_form_for step,
+                        url: is_current_user ? step_path(step) : admin_update_step_path(step),
+                        method: :patch,
+                        html: {
+                          data: {
+                            turbo: false,
+                            step_form_target: "form"
+                          }
+                        } do |f| %>
 
-    <%# Admin override flag so server can bypass daily limit %>
-    <% unless is_current_user %>
-      <%= hidden_field_tag :force, '1' %>
+      <%# Admin override flag so server can bypass daily limit %>
+      <% unless is_current_user %>
+        <%= hidden_field_tag :force, '1' %>
+      <% end %>
+
+      <%= label_tag :steps, "Add Steps", class: 'block text-sm font-medium text-gray-300 mb-1' %>
+      <%= number_field_tag :steps,
+          nil,
+          min: 1,
+          placeholder: "Enter steps",
+          disabled: !can_update,
+          class: "w-full mb-2 px-3 py-2 bg-gray-700 border #{can_update ? 'border-gray-600' : 'border-gray-800'} rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 #{!can_update ? 'opacity-50 cursor-not-allowed' : ''}" %>
+
+      <% if can_update %>
+        <%= f.button :submit,
+            "Update Steps",
+            class: "w-full py-2 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+      <% else %>
+        <div class="w-full py-2 px-4 bg-gray-700 text-gray-400 font-semibold rounded-md text-center text-sm">
+          Steps already updated today
+        </div>
+      <% end %>
+
+      <% if !is_current_user && current_user.admin? %>
+        <p class="text-xs text-yellow-500 text-center italic mt-2">
+          Admin Override Enabled
+        </p>
+      <% end %>
     <% end %>
-
-    <%= label_tag :steps, "Add Steps", class: 'block text-sm font-medium text-gray-300 mb-1' %>
-    <%= number_field_tag :steps,
-        nil,
-        min: 1,
-        placeholder: "Enter steps",
-        disabled: !can_update,
-        class: "w-full mb-2 px-3 py-2 bg-gray-700 border #{can_update ? 'border-gray-600' : 'border-gray-800'} rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 #{!can_update ? 'opacity-50 cursor-not-allowed' : ''}" %>
-
-    <% if can_update %>
-      <%= f.button :submit,
-          "Update Steps",
-          class: "w-full py-2 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
-    <% else %>
-      <div class="w-full py-2 px-4 bg-gray-700 text-gray-400 font-semibold rounded-md text-center text-sm">
-        Steps already updated today
-      </div>
-    <% end %>
-
-    <% if !is_current_user && current_user.admin? %>
-      <p class="text-xs text-yellow-500 text-center italic mt-2">
-        Admin Override Enabled
-      </p>
-    <% end %>
-  <% end %>
   <% end %>
 
   <!-- Last Updated -->
