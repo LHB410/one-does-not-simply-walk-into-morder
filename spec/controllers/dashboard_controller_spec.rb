@@ -23,6 +23,22 @@ RSpec.describe DashboardController, type: :controller do
       end
     end
 
+    context "when logged in as a group member" do
+      it "only loads users from the same group (no cross-group leakage)" do
+        group = create(:group)
+        me = create(:user, :group_member, group: group)
+        teammate = create(:user, :group_member, group: group)
+        outsider = create(:user)                 # ungrouped / legacy
+        other_group_member = create(:user, :group_member) # a different group
+
+        session[:user_id] = me.id
+        get :index
+
+        expect(assigns(:users)).to include(me, teammate)
+        expect(assigns(:users)).not_to include(outsider, other_group_member)
+      end
+    end
+
     context "when logged out" do
       render_views
       before { session[:user_id] = nil }

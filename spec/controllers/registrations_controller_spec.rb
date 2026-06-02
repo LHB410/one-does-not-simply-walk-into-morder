@@ -91,6 +91,24 @@ RSpec.describe RegistrationsController, type: :controller do
       end
     end
 
+    context "with an active path" do
+      include_context "active path with milestones"
+
+      before { allow(Path).to receive(:current).and_return(active_path) }
+
+      it "places the leader and every member on the path so they appear on the map" do
+        post :create, params: valid_params
+        group = Group.last
+
+        expect(group.users.count).to eq(3)
+        group.users.each do |member|
+          position = member.path_users.find_by(path: active_path)
+          expect(position).to be_present
+          expect(position.current_milestone).to eq(shire)
+        end
+      end
+    end
+
     context "with invalid input" do
       it "rolls back fully when the group password is too short" do
         bad = valid_params.deep_dup

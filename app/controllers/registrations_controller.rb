@@ -36,27 +36,41 @@ class RegistrationsController < ApplicationController
         password_confirmation: @registration[:group_password_confirmation]
       )
 
-      # Warm Path.current once so each member's Step seed doesn't re-resolve it.
-      Path.current
+      # Resolve once: used to seed each member's Step and place them on the map.
+      active_path = Path.current
 
-      leader = build_member(@registration[:leader_name], @registration[:leader_email], 0)
-      leader.save!
+      leader = create_member(@registration[:leader_name], @registration[:leader_email], 0, active_path)
       @group.update!(leader: leader)
 
       member_rows.each_with_index do |row, index|
-        build_member(row[:name], row[:email], index + 1).save!
+        create_member(row[:name], row[:email], index + 1, active_path)
       end
     end
 
     leader
   end
 
-  def build_member(name, email, color_index)
-    User.new(
+  def create_member(name, email, color_index, active_path)
+    user = User.create!(
       name: name,
       email: email,
       group: @group,
       token_color: TOKEN_COLORS[color_index % TOKEN_COLORS.size]
+      # NO password — members authenticate via the group's shared password.
+    )
+    place_on_path(user, active_path)
+    user
+  end
+
+  # Give the new user a starting position on the active path so they appear on
+  # the map immediately (mirrors how seeded/legacy users get a PathUser).
+  def place_on_path(user, active_path)
+    return unless active_path
+
+    user.path_users.create!(
+      path: active_path,
+      current_milestone: active_path.milestones.first,
+      progress_percentage: 0.0
     )
   end
 

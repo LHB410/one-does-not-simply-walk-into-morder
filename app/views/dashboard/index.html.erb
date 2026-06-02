@@ -1,28 +1,16 @@
-<% unless logged_in? %>
+<% if logged_in? %>
+  <div class="flex flex-col h-screen md:flex-row">
+    <div class="flex-1 md:flex-none md:w-3/4 bg-gradient-to-br from-amber-50 to-amber-100 overflow-hidden md:p-8">
+      <%= render 'map', path: @active_path, users: @users, current_user: @current_user %>
+    </div>
+
+    <div class="flex-1 md:flex-none md:w-1/4 bg-gray-900 text-white p-3 md:p-6 overflow-y-auto">
+      <%= render 'user_stats', users: @users, current_user: @current_user %>
+    </div>
+  </div>
+
+  <turbo-frame id="stats-popup"></turbo-frame>
+  <turbo-frame id="milestone_popup"></turbo-frame>
+<% else %>
   <%= render 'dashboard/entry_choices' %>
 <% end %>
-
-<div class="flex flex-col h-screen md:flex-row">
-  <div class="flex-1 md:flex-none md:w-3/4 bg-gradient-to-br from-amber-50 to-amber-100 overflow-hidden md:p-8">
-    <% if logged_in? %>
-      <%= render 'map', path: @active_path, users: @users, current_user: @current_user %>
-    <% else %>
-      <div class="w-full h-full flex items-center justify-center bg-gray-900 opacity-50">
-        <p class="text-white text-3xl font-bold">Please log in to view the journey</p>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="flex-1 md:flex-none md:w-1/4 bg-gray-900 text-white p-3 md:p-6 overflow-y-auto">
-    <% if logged_in? %>
-      <%= render 'user_stats', users: @users, current_user: @current_user %>
-    <% else %>
-      <div class="flex items-center justify-center h-full">
-        <p class="text-gray-400">Login to view stats</p>
-      </div>
-    <% end %>
-  </div>
-</div>
-
-<turbo-frame id="stats-popup"></turbo-frame>
-<turbo-frame id="milestone_popup"></turbo-frame>
