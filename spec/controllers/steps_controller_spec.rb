@@ -54,9 +54,6 @@ RSpec.describe StepsController, type: :controller do
 
   describe "PATCH #update" do
     context "when can update today" do
-      before do
-        allow_any_instance_of(User).to receive(:total_miles).and_return(2)
-      end
       it "adds steps successfully" do
         expect {
           patch :update, params: { id: step.id, steps: 5000 }, format: :json
@@ -71,14 +68,39 @@ RSpec.describe StepsController, type: :controller do
         expect(json['success']).to be true
       end
 
-      it "updates path progress" do
-        allow_any_instance_of(User).to receive(:total_miles).and_return(400)
+      context "when the steps cross into the next milestone" do
+        before { allow(Path).to receive(:current).and_return(active_path) }
+
+        it "advances the user's milestone and progress using real distances" do
+          # 400 of 1000 miles lands exactly on Rivendell — let the real
+          # milestone_for_distance/update_progress logic compute it.
+          patch :update, params: { id: step.id, steps: 400 * Step::STEPS_PER_MILE }, format: :json
+
+          path_user.reload
+          expect(path_user.current_milestone).to eq(rivendell)
+          expect(path_user.progress_percentage).to eq(40.0)
+        end
+      end
+    end
+
+    context "as a group member reaching a milestone" do
+      let(:group) { create(:group) }
+      let(:member) { create(:user, :group_member, group: group) }
+      let!(:member_position) { PathUser.start_for(member, active_path) }
+
+      before do
         allow(Path).to receive(:current).and_return(active_path)
-        allow(active_path).to receive(:milestone_for_distance).and_return(rivendell)
-        patch :update, params: { id: step.id, steps: 844_800 }, format: :json
-        path_user.reload
-        expect(path_user.current_milestone).to eq(rivendell)
-        expect(path_user.progress_percentage).to eq(40.0)
+        session[:user_id] = member.id
+      end
+
+      it "advances the member's milestone when their own steps cross into it" do
+        # 400 miles of steps lands exactly on Rivendell (cumulative 400 of 1000).
+        patch :update, params: { id: member.step.id, steps: 400 * Step::STEPS_PER_MILE }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        member_position.reload
+        expect(member_position.current_milestone).to eq(rivendell)
+        expect(member_position.progress_percentage).to eq(40.0)
       end
     end
 
