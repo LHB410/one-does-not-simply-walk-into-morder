@@ -39,5 +39,8 @@
 ./lotr_step_tracker_plan.md
 SCALING_PLAN.md
 
+# Local-only deploy runbook (contains key-handling / heroku commands — keep out of git)
+DEPLOY.md
+
 # Claude Code plans
 .claude/plans/

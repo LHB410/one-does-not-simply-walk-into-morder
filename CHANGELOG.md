@@ -2,6 +2,24 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.0.0] - Groups, Public Sign-up & PII Encryption
+
+### Added
+- **Groups**: a `Group` has many users; a user belongs to one group. Each group has a single shared password (`has_secure_password`) that members log in with, and a leader (`Group#leader`, never an admin) who is the only one able to change it (`GroupsController#update_password`).
+- **Public sign-up**: a logged-out entry screen offers "Log in" or "Sign up"; the sign-up page lets a group leader register their group, themselves, and their members in one step. The transactional creation logic lives in `GroupRegistration` (`app/services/`); the controller is thin.
+- **PII encryption at rest**: `users.email` (deterministic + downcased, so login lookups and uniqueness still work) and the health OAuth tokens are encrypted via Active Record Encryption. Keys are read from the environment (Heroku config vars in production).
+- Ops tooling: `encryption:preflight` (pre-deploy safety check for email case-collisions) and `encryption:backfill_users` (one-off plaintext→encrypted migration) rake tasks, plus `DEPLOY.md` with the full deploy + rollback runbook.
+
+### Changed
+- Authentication branches by membership: group members authenticate against their group's shared password, admins/legacy users against their own.
+- The dashboard is scoped to the current user's group, so groups never see each other's members.
+- New members are placed at the start of the active path on sign-up via `PathUser.start_for` (shared with the seeds) so they appear on the map immediately.
+- `users.password_digest` is now nullable (group members have no individual password) and `users.email` widened to `text` (encrypted ciphertext exceeds varchar(255)).
+- Removed the unused `sidekiq` gem — background work runs on Solid Queue. Updated `erb` to 6.0.4 (security advisory).
+
+### Fixed
+- Members' step cards no longer show a misleading "already updated" message (or an edit form) to non-admin viewers. The step form now renders only for the user themselves or an admin; "Steps already updated today" appears only on your own card when you have actually updated today.
+
 ## [2.0.0] - Replace Fitbit with Google Health API
 
 ### Changed
