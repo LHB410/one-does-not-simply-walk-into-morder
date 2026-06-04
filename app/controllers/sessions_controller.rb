@@ -9,6 +9,10 @@ class SessionsController < ApplicationController
     # else (admin/legacy) authenticates against their own.
     authenticated = user&.group ? user.group.authenticate(password) : user&.authenticate(password)
     if authenticated
+      # Regenerate the session on privilege change to prevent session fixation:
+      # any session id/contents an attacker may have planted is discarded before
+      # we mark the session authenticated.
+      reset_session
       session[:user_id] = user.id
       respond_to do |format|
         # Force a full page visit so content conditioned on logged_in? re-renders
@@ -32,7 +36,9 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session[:user_id] = nil
+    # Tear down the whole session, not just the user id, so no authenticated
+    # state (OAuth markers, timezone, etc.) survives logout.
+    reset_session
     redirect_to root_path
   end
 end

@@ -112,6 +112,19 @@ RSpec.describe User, type: :model do
 
       expect(member).to be_valid
     end
+
+    it "rejects a non-group user password shorter than 8 characters" do
+      user = build(:user, password: "short", password_confirmation: "short")
+
+      expect(user).not_to be_valid
+      expect(user.errors[:password]).to be_present
+    end
+
+    it "accepts a non-group user password of at least 8 characters" do
+      user = build(:user, password: "longenough", password_confirmation: "longenough")
+
+      expect(user).to be_valid
+    end
   end
 
   # Guards the user's concern that the auth/validation changes could corrupt or

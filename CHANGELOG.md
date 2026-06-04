@@ -2,6 +2,16 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.1.0] - Security Hardening
+
+### Added
+- **Login rate limiting** via `rack-attack` (`config/initializers/rack_attack.rb`): a tight per-IP login throttle (10/min) to blunt brute-force and credential-stuffing against the shared group password, plus a global per-IP request flood limit (300/5min). Throttled requests get a `429` with a `Retry-After` header.
+
+### Security
+- **Session fixation fixed**: `SessionsController` now calls `reset_session` before establishing the logged-in session, and fully tears down the session on logout (previously only the user id was cleared).
+- **Password length policy**: admin/legacy users now require a minimum 8-character password (`minimum: 8`, `allow_nil: true`), mirroring the group password policy.
+- **Production data exposure closed**: `*.dump` and `*.sql` are now gitignored so database dumps can't be committed.
+
 ## [3.0.0] - Groups, Public Sign-up & PII Encryption
 
 ### Added

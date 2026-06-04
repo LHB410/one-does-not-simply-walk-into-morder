@@ -22,6 +22,9 @@ gem "jbuilder"
 # Authentication
 gem "bcrypt", "~> 3.1.7"
 
+# Rate limiting / brute-force throttling at the rack layer [https://github.com/rack/rack-attack]
+gem "rack-attack"
+
 # Background jobs run on Solid Queue (see config.active_job.queue_adapter = :solid_queue)
 
 gem "googleauth"
