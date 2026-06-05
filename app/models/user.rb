@@ -27,6 +27,10 @@ class User < ApplicationRecord
   # password. Group members are exempt; runs only on create so existing rows
   # are never re-validated.
   validates :password, presence: true, on: :create, unless: :group_member?
+  # Minimum-length policy mirroring Group's shared password. allow_nil lets
+  # group members (no individual password) and ordinary updates that don't
+  # touch the password through untouched.
+  validates :password, length: { minimum: 8 }, allow_nil: true
 
   after_create :create_associated_step
 

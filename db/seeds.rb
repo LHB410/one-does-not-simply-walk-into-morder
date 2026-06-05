@@ -70,8 +70,8 @@ users_data.each do |user_data|
   user = User.create!(
     name: user_data[:name],
     email: user_data[:email],
-    password: "pass123",
-    password_confirmation: "pass123",
+    password: "pass1234",
+    password_confirmation: "pass1234",
     admin: user_data[:admin],
     token_color: user_data[:color]
   )
@@ -83,5 +83,5 @@ users_data.each do |user_data|
 end
 
 puts "Seed complete!"
-puts "Login with any user email and password: pass123"
+puts "Login with any user email and password: pass1234"
 puts "Admin user: frodo@test.com"
