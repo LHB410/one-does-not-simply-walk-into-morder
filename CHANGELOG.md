@@ -2,6 +2,11 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.1.1] - Fix mobile milestone placement
+
+### Fixed
+- **Milestones/path pushed up on mobile**: the map is now locked to a fixed 4:3 box (matching the `map_of_middle_earth.svg` aspect ratio) and centered within its pane at every viewport. Previously the 4:3 background image (`object-contain`) and the 1:1 overlay SVG (`viewBox="0 0 100 100"`, `xMidYMid meet`) only aligned at desktop-width aspect ratios; on narrower/taller mobile panes the image letterboxed downward while the square overlay stayed top-anchored, shifting the path and milestone markers up off the terrain. Existing milestone coordinates are unchanged.
+
 ## [3.1.0] - Security Hardening
 
 ### Added
