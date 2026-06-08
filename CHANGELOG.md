@@ -7,6 +7,9 @@ All notable changes to the Walk to Mordor project.
 ### Fixed
 - **Milestones/path pushed up on mobile**: the map is now locked to a fixed 4:3 box (matching the `map_of_middle_earth.svg` aspect ratio) and centered within its pane at every viewport. Previously the 4:3 background image (`object-contain`) and the 1:1 overlay SVG (`viewBox="0 0 100 100"`, `xMidYMid meet`) only aligned at desktop-width aspect ratios; on narrower/taller mobile panes the image letterboxed downward while the square overlay stayed top-anchored, shifting the path and milestone markers up off the terrain. Existing milestone coordinates are unchanged.
 
+### Security
+- **Puma updated 6.6.0 → 8.0.2**, clearing two High-severity advisories in the PROXY Protocol v1 parser (CVE-2026-47736 remote memory exhaustion, CVE-2026-47737 repeated protocol headers on persistent connections). The vulnerable path was not enabled in this app, but the bump keeps the `bundle-audit` CI gate green.
+
 ## [3.1.0] - Security Hardening
 
 ### Added
