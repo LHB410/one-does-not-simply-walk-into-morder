@@ -76,6 +76,18 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to include("Log in")
         expect(response.body).to include(sign_up_path)
       end
+
+      it "serves as a public homepage explaining the app and its use of Google data" do
+        get :index
+
+        expect(response.body).to include("Walk to Mordor")
+        expect(response.body).to match(/steps/i)
+        expect(response.body).to include("Google Health")
+        expect(response.body).to match(/read-only/i)
+        expect(response.body).to match(/daily step count/i)
+        expect(response.body).to include(privacy_path)
+        expect(response.body).to include(terms_path)
+      end
     end
   end
 end
