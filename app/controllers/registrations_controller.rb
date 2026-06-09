@@ -7,6 +7,8 @@ class RegistrationsController < ApplicationController
 
   def create
     @registration = registration_params
+    return reject_without_agreement unless terms_accepted?
+
     leader = GroupRegistration.new(@registration).call
 
     session[:user_id] = leader.id
@@ -17,6 +19,15 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+  def terms_accepted?
+    params.dig(:registration, :terms_accepted) == "1"
+  end
+
+  def reject_without_agreement
+    @error = "You must agree to the Terms of Service and Privacy Policy to sign up."
+    render :new, status: :unprocessable_entity
+  end
 
   def registration_params
     params.require(:registration).permit(
