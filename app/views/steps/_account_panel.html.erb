@@ -1,0 +1,39 @@
+<div class="px-6 py-4 space-y-8">
+  <%# Change name %>
+  <section>
+    <h3 class="text-sm font-semibold text-gray-200 mb-3">Your name</h3>
+    <%= form_with url: account_path, method: :patch, data: { turbo_frame: "_top" } do |f| %>
+      <div class="flex items-center gap-2">
+        <%= f.text_field :name,
+                         name: "user[name]",
+                         value: current_user.name,
+                         required: true,
+                         class: "flex-1 px-3 py-2 rounded-md bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none focus:border-yellow-600" %>
+        <%= f.submit "Save",
+                     class: "py-2 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+      </div>
+    <% end %>
+  </section>
+
+  <%# Danger zone — collapsed by default so destructive actions aren't clicked by accident %>
+  <section data-controller="danger-zone" class="border-t border-gray-800 pt-4">
+    <button type="button"
+            data-action="danger-zone#toggle"
+            class="flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300 cursor-pointer">
+      <span data-danger-zone-target="chevron" aria-hidden="true">▸</span>
+      Danger zone
+    </button>
+
+    <div data-danger-zone-target="content" class="hidden mt-4 rounded-md border border-red-800 bg-red-900/20 p-4">
+      <p class="text-xs text-gray-300 mb-3">
+        Closing your account permanently deletes your account and all of your data — your steps, progress,
+        and milestones. This cannot be undone.
+      </p>
+      <%= button_to "Close My Account",
+                    account_path,
+                    method: :delete,
+                    class: "w-full py-2 px-4 bg-red-900 hover:bg-red-950 text-white font-semibold rounded-md transition-colors duration-200 border border-red-700",
+                    data: { turbo_frame: "_top", turbo_confirm: "Permanently delete your account and all your data? This cannot be undone." } %>
+    </div>
+  </section>
+</div>

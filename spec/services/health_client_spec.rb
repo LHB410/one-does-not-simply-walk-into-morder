@@ -208,6 +208,40 @@ RSpec.describe HealthClient do
     end
   end
 
+  describe ".revoke_token" do
+    context "with a token" do
+      let(:revoke_response) { instance_double(Faraday::Response, success?: true, status: 200) }
+
+      before { allow(Faraday).to receive(:post).and_return(revoke_response) }
+
+      it "posts the token to Google's revoke endpoint, form-encoded" do
+        described_class.revoke_token("refresh_token")
+
+        expect(Faraday).to have_received(:post).with(
+          "https://oauth2.googleapis.com/revoke",
+          URI.encode_www_form(token: "refresh_token"),
+          hash_including("Content-Type" => "application/x-www-form-urlencoded")
+        )
+      end
+    end
+
+    context "with a blank token" do
+      it "does not call the revoke endpoint" do
+        expect(Faraday).not_to receive(:post)
+
+        described_class.revoke_token(nil)
+      end
+    end
+
+    context "when the revoke request fails" do
+      before { allow(Faraday).to receive(:post).and_raise(Faraday::ConnectionFailed.new("boom")) }
+
+      it "swallows the error so disconnect can still proceed" do
+        expect { described_class.revoke_token("refresh_token") }.not_to raise_error
+      end
+    end
+  end
+
   describe ".fetch_identity" do
     it "returns the health user id from the identity endpoint" do
       identity = { "name" => "users/me/identity", "legacyUserId" => "C9WFGD", "healthUserId" => "429903135594184479" }

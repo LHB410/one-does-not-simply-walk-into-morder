@@ -35,6 +35,7 @@ RSpec.describe RegistrationsController, type: :controller do
           group_password_confirmation: "speak-friend",
           leader_name: "Frodo",
           leader_email: "frodo@shire.me",
+          terms_accepted: "1",
           members: [
             { name: "Sam", email: "sam@shire.me" },
             { name: "Merry", email: "merry@buckland.me" }
@@ -130,6 +131,14 @@ RSpec.describe RegistrationsController, type: :controller do
         bad[:registration][:group_password_confirmation] = "mismatch"
 
         expect { post :create, params: bad }.not_to change { [ Group.count, User.count ] }
+      end
+
+      it "does not sign up when the terms of service are not agreed to" do
+        without_terms = valid_params.deep_dup
+        without_terms[:registration].delete(:terms_accepted)
+
+        expect { post :create, params: without_terms }.not_to change { [ Group.count, User.count ] }
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

@@ -54,6 +54,14 @@
               aria-selected="false">
         Badges
       </button>
+      <button role="tab"
+              class="px-3 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-200 cursor-pointer"
+              data-stats-tabs-target="tab"
+              data-action="click->stats-tabs#selectTab"
+              data-tab-index="4"
+              aria-selected="false">
+        Account
+      </button>
     </div>
 
     <%# Tab panels %>
@@ -122,6 +130,11 @@
       <%# Badges Collected panel %>
       <div role="tabpanel" data-stats-tabs-target="panel" class="hidden">
         <%= render "steps/badges_collected", purchased_badges: purchased_badges %>
+      </div>
+
+      <%# Account panel %>
+      <div role="tabpanel" data-stats-tabs-target="panel" class="hidden">
+        <%= render "steps/account_panel" %>
       </div>
 
     </div>

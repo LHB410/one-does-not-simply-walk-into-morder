@@ -1,0 +1,86 @@
+<% content_for(:title) { "Privacy Policy — The Fellowship Tracker" } %>
+
+<div class="min-h-screen bg-stone-900 text-gray-200 py-10 px-4">
+  <div class="max-w-3xl mx-auto bg-stone-800 rounded-lg shadow-2xl border-4 border-yellow-600 p-8">
+    <h1 class="text-3xl font-bold text-yellow-500 mb-2" style="font-family: 'Cinzel', serif;">Privacy Policy</h1>
+    <p class="text-sm text-gray-400 mb-8">Last updated: June 9, 2026</p>
+
+    <section class="space-y-4 text-sm leading-relaxed">
+      <p>
+        The Fellowship Tracker ("the App", "we", "us") is a collaborative fitness app that turns your
+        daily steps into progress along a shared journey with your group. This policy explains what data
+        we collect, how we use it, and the choices you have.
+      </p>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">Information we collect</h2>
+      <ul class="list-disc list-inside space-y-1">
+        <li>Your name and email address (your email is <strong>encrypted at rest</strong>).</li>
+        <li>Your daily and cumulative step counts and your progress along the journey.</li>
+        <li>Your time zone, used to schedule a daily step sync.</li>
+        <li>
+          If you choose to connect Google Health: step-count data retrieved from the Google Health API,
+          along with the access and refresh tokens needed to read it (tokens are <strong>encrypted at
+          rest</strong>).
+        </li>
+      </ul>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">How we use your information</h2>
+      <p>
+        We use your information solely to provide the App: to record your steps, show your position and
+        your group's position on the journey map, and track milestones. We do not sell your data, and we
+        do not use it for advertising.
+      </p>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">Google user data — Limited Use</h2>
+      <p>
+        The App's use and transfer of information received from Google APIs adheres to the
+        <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener"
+           class="text-yellow-500 underline hover:text-yellow-400">Google API Services User Data Policy</a>,
+        including the <strong>Limited Use</strong> requirements. Specifically, step data obtained from the
+        Google Health API is used only to display your progress within the App, is never sold, is never
+        used for advertising, and is not transferred to others except as necessary to provide this feature,
+        to comply with applicable law, or as part of a merger or acquisition.
+      </p>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">How your data is protected</h2>
+      <ul class="list-disc list-inside space-y-1">
+        <li>Personally identifiable data (your email and any Google tokens) is encrypted at rest.</li>
+        <li>Passwords are stored only as salted bcrypt hashes — never in plain text.</li>
+        <li>All traffic is served over encrypted connections (HTTPS/TLS).</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">Data retention and deletion</h2>
+      <p>
+        We keep your data only while your account is open. You are in control:
+      </p>
+      <ul class="list-disc list-inside space-y-1">
+        <li>
+          <strong>Disconnecting Google Health</strong> revokes our access token with Google and stops any
+          further syncing. Your existing progress remains in the App.
+        </li>
+        <li>
+          <strong>Closing your account</strong> permanently deletes your account and all associated data —
+          your step history, journey progress, milestones, and any stored Google tokens — and revokes the
+          Google grant. This action cannot be undone.
+        </li>
+      </ul>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">Third-party services</h2>
+      <ul class="list-disc list-inside space-y-1">
+        <li><strong>Google</strong> — OAuth sign-in and the Google Health API (only if you connect it).</li>
+        <li><strong>Heroku</strong> — application hosting and database infrastructure.</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">Contact</h2>
+      <p>
+        Questions about this policy or your data? Please
+        <a href="https://github.com/LHB410/one-does-not-simply-walk-into-morder/issues" target="_blank" rel="noopener"
+           class="text-yellow-500 underline hover:text-yellow-400">open an issue on our GitHub</a>.
+      </p>
+    </section>
+
+    <div class="pt-8">
+      <%= link_to "← Back", root_path, class: "text-yellow-500 hover:text-yellow-400 text-sm" %>
+    </div>
+  </div>
+</div>

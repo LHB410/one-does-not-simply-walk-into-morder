@@ -6,7 +6,7 @@
         Form Your Fellowship
       </h2>
       <p class="text-gray-300 text-sm italic">
-        "One does not simply walk into Mordor &mdash; gather your companions."
+        "One does not simply walk into Mordor."
       </p>
     </div>
 
@@ -20,7 +20,7 @@
     <%= simple_form_for :registration,
                         url: sign_up_path,
                         method: :post,
-                        html: { data: { turbo: true } } do |f| %>
+                        html: { data: { turbo: true, controller: "terms-gate" } } do |f| %>
 
       <h3 class="text-yellow-500 font-semibold mb-2">Your Fellowship</h3>
 
@@ -101,9 +101,25 @@
           wrapper_html: { class: "mb-6" },
           label_html: { class: label_classes } %>
 
+      <div class="flex items-start gap-2 mt-6 mb-6">
+        <input type="checkbox" name="registration[terms_accepted]" value="1" id="terms_accepted" required
+               data-terms-gate-target="checkbox"
+               data-action="change->terms-gate#toggle"
+               class="mt-1 h-4 w-4 rounded border-yellow-600 bg-stone-700 text-yellow-600 focus:ring-yellow-500">
+        <label for="terms_accepted" class="text-sm text-gray-300">
+          I agree to the
+          <%= link_to "Terms of Service", terms_path, target: "_blank", rel: "noopener",
+              class: "text-yellow-500 hover:text-yellow-400 underline" %>
+          and
+          <%= link_to "Privacy Policy", privacy_path, target: "_blank", rel: "noopener",
+              class: "text-yellow-500 hover:text-yellow-400 underline" %>.
+        </label>
+      </div>
+
       <%= f.button :submit,
           "Begin the Quest",
-          class: "w-full py-3 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+          data: { terms_gate_target: "submit" },
+          class: "w-full py-3 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-yellow-600" %>
     <% end %>
 
     <div class="mt-6 text-center text-sm text-gray-400">

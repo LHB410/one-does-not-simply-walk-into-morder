@@ -2,6 +2,19 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.2.0] - Account Closure, Privacy Policy & Terms
+
+### Added
+- **Account tab** in the stats popup: change your display name, and a collapsible **Danger zone** holding the account-closure action (kept collapsed and away from the logout button so it can't be clicked by accident).
+- **Close My Account**: a permanent account-deletion flow (`AccountClosure` service + `AccountsController#destroy`). Closing an account revokes the user's Google Health grant, deletes the user and all associated data (steps, daily entries, path progress, milestone pins), and logs them out. If a group leader closes their account, leadership transfers to the next-joined member; if they were the group's last member, the now-empty group is deleted.
+- **Privacy Policy** (`/privacy`) and **Terms of Service** (`/terms`) pages, linked from the logged-out landing screen. The Privacy Policy includes the Google API Services "Limited Use" disclosure required for OAuth restricted-scope verification, and documents the account-closure deletion path.
+- **Terms agreement at sign-up**: a required "I agree to the Terms of Service and Privacy Policy" checkbox on the registration form (with links). The "Begin the Quest" button stays disabled until it's ticked, and sign-up is also enforced server-side so it's rejected without consent.
+- **App logo** now used as the browser-tab favicon (`walk-to-mordor-logo.png`), replacing the default Rails icon.
+
+### Changed
+- **Google Health disconnect now revokes the token with Google** (`HealthClient.revoke_token`), not just locally — disconnecting invalidates the grant on Google's side, not only in our database. Revocation is best-effort, so a failed revoke never blocks the disconnect.
+- **README** rewritten and trimmed (189 → 59 lines): corrected stale Fitbit references to Google Health, fixed the journey/destination and sync-time details, and added the Buy Me a Coffee button.
+
 ## [3.1.1] - Fix mobile milestone placement
 
 ### Fixed

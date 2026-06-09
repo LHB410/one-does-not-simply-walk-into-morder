@@ -36,6 +36,8 @@ class HealthController < ApplicationController
   end
 
   def disconnect
+    HealthClient.revoke_token(current_user.health_refresh_token || current_user.health_access_token)
+
     current_user.update!(
       health_uid: nil,
       health_access_token: nil,
