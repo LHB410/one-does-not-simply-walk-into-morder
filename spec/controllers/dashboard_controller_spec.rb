@@ -68,13 +68,26 @@ RSpec.describe DashboardController, type: :controller do
       render_views
       before { session[:user_id] = nil }
 
-      it "presents the sign up and log in choices" do
+      it "presents the login form and a sign up option" do
         get :index
 
         expect(response).to have_http_status(:success)
+        expect(response.body).to include(login_path)
+        expect(response.body).to include("Begin Journey")
         expect(response.body).to include("Sign up")
-        expect(response.body).to include("Log in")
         expect(response.body).to include(sign_up_path)
+      end
+
+      it "serves as a public homepage explaining the app and its use of Google data" do
+        get :index
+
+        expect(response.body).to include("Walk to Mordor")
+        expect(response.body).to match(/steps/i)
+        expect(response.body).to include("Google Health")
+        expect(response.body).to match(/read-only/i)
+        expect(response.body).to match(/daily step count/i)
+        expect(response.body).to include(privacy_path)
+        expect(response.body).to include(terms_path)
       end
     end
   end

@@ -2,6 +2,12 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.2.1] - Public homepage for verification
+
+### Changed
+- **The root `/` is now a public homepage** for logged-out visitors, with the email/password login form shown directly in a card (one step to sign in — no separate login page or modal). It describes the app's purpose and features, (converted to miles for journey progress; never sold/shared/advertised; optional and disconnectable), and links to the Privacy Policy and Terms. This addresses the verification flags about the homepage being behind login, not explaining the app or its use of Google data, and not linking to privacy. The homepage URL for the consent screen is the site root.
+- **App name unified to "Walk to Mordor"** on the homepage, matching the OAuth consent screen (resolves the "app name mismatch" flag).
+
 ## [3.2.0] - Account Closure, Privacy Policy & Terms
 
 ### Added
