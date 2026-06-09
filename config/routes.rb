@@ -4,9 +4,13 @@ Rails.application.routes.draw do
 
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
+  delete "account", to: "accounts#destroy", as: :account
 
   get "sign_up", to: "registrations#new", as: :sign_up
   post "sign_up", to: "registrations#create"
+
+  get "privacy", to: "pages#privacy", as: :privacy
+  get "terms", to: "pages#terms", as: :terms
 
   patch "group/password", to: "groups#update_password", as: :group_password
 

@@ -6,6 +6,7 @@ class HealthClient
   API_BASE = "https://health.googleapis.com".freeze
   AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth".freeze
   TOKEN_URL = "https://oauth2.googleapis.com/token".freeze
+  REVOKE_URL = "https://oauth2.googleapis.com/revoke".freeze
   SCOPE = "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly".freeze
 
   class TokenRefreshError < StandardError; end
@@ -52,6 +53,25 @@ class HealthClient
 
     body = JSON.parse(response.body)
     body["healthUserId"] || body["legacyUserId"]
+  end
+
+  # Revokes the OAuth grant on Google's side so a disconnect invalidates the
+  # token everywhere, not just locally. Revoking the refresh token cascades to
+  # all access tokens derived from it. Best-effort by design: a failed revoke
+  # (network error, already-invalid token) must never stop the user from
+  # disconnecting, so errors are logged and swallowed.
+  def self.revoke_token(token)
+    return if token.blank?
+
+    Faraday.post(
+      REVOKE_URL,
+      URI.encode_www_form(token: token),
+      "Content-Type" => "application/x-www-form-urlencoded"
+    )
+    true
+  rescue Faraday::Error => e
+    Rails.logger.error("Google Health token revoke failed: #{e.message}")
+    false
   end
 
   def self.bearer_connection(access_token)
