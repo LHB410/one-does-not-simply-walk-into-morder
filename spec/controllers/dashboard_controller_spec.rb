@@ -68,12 +68,13 @@ RSpec.describe DashboardController, type: :controller do
       render_views
       before { session[:user_id] = nil }
 
-      it "presents the sign up and log in choices" do
+      it "presents the login form and a sign up option" do
         get :index
 
         expect(response).to have_http_status(:success)
+        expect(response.body).to include(login_path)
+        expect(response.body).to include("Begin Journey")
         expect(response.body).to include("Sign up")
-        expect(response.body).to include("Log in")
         expect(response.body).to include(sign_up_path)
       end
 

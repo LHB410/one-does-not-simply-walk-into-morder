@@ -1,9 +1,8 @@
 <%# app/views/dashboard/_entry_choices.html.erb %>
 <%# Public homepage (logged-out root). Explains the app's purpose, features, and %>
 <%# exactly how it uses Google Health data — viewable without logging in — and %>
-<%# offers Log in / Sign up. "Log in" reveals the login modal in place. %>
-<div data-controller="entry">
-  <div data-entry-target="choices" class="min-h-screen bg-stone-900 text-gray-200">
+<%# shows the login form (email/password) and a Sign up option directly. %>
+<div class="min-h-screen bg-stone-900 text-gray-200">
     <div class="max-w-3xl mx-auto px-4 py-12">
 
       <%# Hero %>
@@ -20,13 +19,32 @@
       </header>
 
       <%# Log in / Sign up %>
+      <% field_classes = "w-full px-4 py-2 bg-stone-700 border border-yellow-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500" %>
+      <% label_classes = "block text-sm font-medium text-gray-300 mb-1" %>
       <div class="mt-8 max-w-sm mx-auto bg-stone-800 rounded-lg shadow-2xl p-6 border-4 border-yellow-600">
-        <button type="button" data-action="entry#showLogin"
-                class="w-full py-3 px-4 mb-3 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer">
-          Log in
-        </button>
+        <%= simple_form_for :session, url: login_path, method: :post, html: { data: { turbo: true } } do |f| %>
+          <div id="login-error" class="hidden"></div>
+
+          <%= f.input :email,
+              required: true,
+              placeholder: "frodo@shire.me",
+              input_html: { class: field_classes },
+              wrapper_html: { class: "mb-3" },
+              label_html: { class: label_classes } %>
+
+          <%= f.input :password,
+              required: true,
+              placeholder: "Enter your password",
+              input_html: { class: field_classes },
+              wrapper_html: { class: "mb-4" },
+              label_html: { class: label_classes } %>
+
+          <%= f.button :submit, "Begin Journey",
+              class: "w-full py-3 px-4 bg-yellow-600 hover:bg-yellow-700 text-stone-900 font-bold rounded-md transition-colors duration-200 cursor-pointer" %>
+        <% end %>
+
         <%= link_to "Sign up", sign_up_path,
-            class: "block w-full py-3 px-4 border border-yellow-600 text-yellow-500 hover:bg-stone-700 font-bold rounded-md transition-colors duration-200 text-center" %>
+            class: "block w-full py-3 px-4 mt-3 border border-yellow-600 text-yellow-500 hover:bg-stone-700 font-bold rounded-md transition-colors duration-200 text-center" %>
         <p class="mt-4 text-xs text-gray-400 text-center">New here? Sign up to form your fellowship.</p>
 
         <div class="mt-6 flex justify-center">
@@ -84,8 +102,3 @@
       </footer>
     </div>
   </div>
-
-  <div data-entry-target="login" class="hidden">
-    <%= render 'sessions/login_modal' %>
-  </div>
-</div>
