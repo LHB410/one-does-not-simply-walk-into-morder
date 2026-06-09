@@ -73,13 +73,4 @@
                   class: "w-full py-2 px-4 bg-red-800 hover:bg-red-900 text-white font-semibold rounded-md transition-colors duration-200",
                   data: { turbo: false } %>
   </div>
-
-  <!-- Close Account (permanent deletion) -->
-  <div class="pt-3">
-    <%= button_to "Close My Account",
-                  account_path,
-                  method: :delete,
-                  class: "w-full py-2 px-4 bg-red-900 hover:bg-red-950 text-white font-semibold rounded-md transition-colors duration-200 border border-red-700",
-                  data: { turbo_confirm: "Permanently delete your account and all your data? This cannot be undone." } %>
-  </div>
 </div>

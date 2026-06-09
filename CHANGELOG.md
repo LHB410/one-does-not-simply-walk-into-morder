@@ -5,7 +5,8 @@ All notable changes to the Walk to Mordor project.
 ## [3.2.0] - Account Closure, Privacy Policy & Terms
 
 ### Added
-- **Close My Account**: a permanent account-deletion flow (`AccountClosure` service + `AccountsController#destroy`, reachable from the dashboard sidebar). Closing an account revokes the user's Google Health grant, deletes the user and all associated data (steps, daily entries, path progress, milestone pins), and logs them out. If a group leader closes their account, leadership transfers to the next-joined member; if they were the group's last member, the now-empty group is deleted.
+- **Account tab** in the stats popup: change your display name, and a collapsible **Danger zone** holding the account-closure action (kept collapsed and away from the logout button so it can't be clicked by accident).
+- **Close My Account**: a permanent account-deletion flow (`AccountClosure` service + `AccountsController#destroy`). Closing an account revokes the user's Google Health grant, deletes the user and all associated data (steps, daily entries, path progress, milestone pins), and logs them out. If a group leader closes their account, leadership transfers to the next-joined member; if they were the group's last member, the now-empty group is deleted.
 - **Privacy Policy** (`/privacy`) and **Terms of Service** (`/terms`) pages, linked from the logged-out landing screen. The Privacy Policy includes the Google API Services "Limited Use" disclosure required for OAuth restricted-scope verification, and documents the account-closure deletion path.
 - **App logo** now used as the browser-tab favicon (`walk-to-mordor-logo.png`), replacing the default Rails icon.
 

@@ -1,6 +1,39 @@
 require 'rails_helper'
 
 RSpec.describe AccountsController, type: :controller do
+  describe "PATCH #update" do
+    context "when logged in" do
+      include_context "authenticated user"
+
+      it "updates the user's name and redirects with a notice" do
+        patch :update, params: { user: { name: "Aragorn" } }
+
+        expect(user.reload.name).to eq("Aragorn")
+        expect(response).to redirect_to(root_path)
+        expect(flash[:notice]).to be_present
+      end
+
+      it "rejects a blank name and leaves it unchanged" do
+        original = user.name
+
+        patch :update, params: { user: { name: "" } }
+
+        expect(user.reload.name).to eq(original)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to be_present
+      end
+    end
+
+    context "when not logged in" do
+      before { session[:user_id] = nil }
+
+      it "redirects to root without updating" do
+        patch :update, params: { user: { name: "Sauron" } }
+        expect(response).to redirect_to(root_path)
+      end
+    end
+  end
+
   describe "DELETE #destroy" do
     context "when logged in" do
       include_context "authenticated user"

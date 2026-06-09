@@ -4,7 +4,8 @@ Rails.application.routes.draw do
 
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
-  delete "account", to: "accounts#destroy", as: :account
+  patch "account", to: "accounts#update", as: :account
+  delete "account", to: "accounts#destroy"
 
   get "sign_up", to: "registrations#new", as: :sign_up
   post "sign_up", to: "registrations#create"
