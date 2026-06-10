@@ -7,8 +7,8 @@ Run via `heroku run --app walk-to-mordor rails console` and paste:
 
 ```ruby
 user_id = 7
-date    = Date.new(2026, 6, 9)
-steps   = 11712
+date    = Date.new(2026, 6, 8)
+steps   = 6850
 
 user  = User.find(user_id)
 path  = Path.current

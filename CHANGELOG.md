@@ -2,6 +2,11 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.2.4] - Manual step entry timezone fix
+
+### Fixed
+- **Manually-logged steps were dated by the server's UTC day, not the user's.** `Step#add_steps` (and `can_update_today?`) read `Date.current`, which resolves in UTC because no per-request timezone was set — so a member in the Americas logging steps late in the evening had the entry stamped with the *next* calendar day (e.g. a 10:55 PM Eastern save on Jun 9 was recorded as Jun 10). The `3.2.2` fix covered the sync **job** (which computes the user's local date itself); this covers the **manual** path. Requests now run inside the acting user's timezone (an `around_action` wrapping each request in `Time.use_zone(current_user.timezone)`), so `Date.current` reflects their day everywhere. Logged-out requests and users with no saved zone fall back to the app default; the sync job is unaffected.
+
 ## [3.2.3] - Privacy Policy & Terms brand fix
 
 ### Changed
