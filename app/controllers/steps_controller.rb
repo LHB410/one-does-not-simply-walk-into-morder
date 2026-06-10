@@ -13,6 +13,7 @@ class StepsController < ApplicationController
   end
 
   def update
+    capture_timezone
     @step = current_user.step
 
     override = current_user.admin? || params[:force].present?
@@ -56,6 +57,15 @@ class StepsController < ApplicationController
   end
 
   private
+
+  # Persist the browser timezone; only a recognised zone is stored.
+  def capture_timezone
+    zone = Time.find_zone(params[:timezone].to_s)
+    return unless zone
+    return if current_user.timezone == zone.name
+
+    current_user.update_column(:timezone, zone.name)
+  end
 
   def respond_with_success
     respond_to do |format|

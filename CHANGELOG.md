@@ -2,6 +2,11 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.2.5] - Capture browser timezone for all members
+
+### Fixed
+- **Manual-only members had no timezone, so the 3.2.4 fix fell back to UTC for them.** Timezone was only ever captured during the Google Health connect flow, so members who only log steps manually (and every new sign-up) had a blank `timezone` — meaning their manual entries were still dated by UTC. The step form now sends the browser's timezone with each submission; `StepsController#update` persists it (only zones `Time.find_zone` recognises, so invalid/hostile input is dropped and never stored), and request timezone resolution is user-first: saved zone, then the validated browser param, then the app default. New members are now covered without needing to connect Google Health.
+
 ## [3.2.4] - Manual step entry timezone fix
 
 ### Fixed

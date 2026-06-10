@@ -4,20 +4,20 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user, :logged_in?
 
-  # Run every request in the acting user's timezone so Date.current — and so the
-  # date stamped on a manually-logged step — reflects *their* day, not the
-  # server's UTC day. Logged-out requests (and users with no saved zone) fall
-  # back to the app default. The sync job sets its own zone, so it is unaffected.
+  # Run each request in the user's timezone so Date.current reflects their day.
   around_action :use_user_time_zone
 
   private
 
   def use_user_time_zone(&block)
-    Time.use_zone(current_user_time_zone, &block)
+    Time.use_zone(request_time_zone, &block)
   end
 
-  def current_user_time_zone
-    current_user&.timezone.presence || Time.zone
+  # Saved zone first, then a (validated) browser param, then the default.
+  def request_time_zone
+    current_user&.timezone.presence ||
+      Time.find_zone(params[:timezone].to_s) ||
+      Time.zone
   end
 
   def current_user
