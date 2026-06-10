@@ -12,6 +12,9 @@ class User < ApplicationRecord
   encrypts :email, deterministic: true, downcase: true
   encrypts :health_access_token
   encrypts :health_refresh_token
+  # Non-deterministic: we only ever compare it after loading the user (never
+  # query by it), so it doesn't need to be deterministic.
+  encrypts :health_sync_token
 
   has_one :step, dependent: :destroy
   has_many :path_users, dependent: :destroy

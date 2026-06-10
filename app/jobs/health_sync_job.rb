@@ -6,19 +6,27 @@ class HealthSyncJob < ApplicationJob
   CATCHUP_HOUR = 6
   CATCHUP_MINUTE = 0
 
-  def perform(user_id, date = nil)
+  def perform(user_id, date = nil, token = nil)
     user = User.find_by(id: user_id)
     return unless user&.health_connected?
+    # Ignore jobs from a superseded schedule: each connect mints a fresh token, so
+    # any older chain (e.g. left over from a reconnect) no longer matches and stops
+    # here — neither syncing nor rescheduling. This is what prevents duplicates.
+    return if token != user.health_sync_token
 
-    sync_date = date ? Date.parse(date) : Date.current
+    # Default to "today" in the USER's timezone, not the server's (UTC). The job
+    # fires at 23:59 local, which for users behind UTC is already the next UTC
+    # day — using Date.current there would sync the wrong (near-empty) day.
+    sync_date = date ? Date.parse(date) : self.class.local_date(user)
     HealthSyncService.new(user).call(date: sync_date)
 
-    schedule_next_run(user) unless date
+    schedule_next_run(user, token) unless date
   end
 
   def self.schedule_for(user)
-    run_at = next_sync_time(user)
-    set(wait_until: run_at).perform_later(user.id)
+    token = SecureRandom.hex(16)
+    user.update!(health_sync_token: token)
+    set(wait_until: next_sync_time(user)).perform_later(user.id, nil, token)
   end
 
   def self.next_sync_time(user)
@@ -42,15 +50,20 @@ class HealthSyncJob < ApplicationJob
     zone || Time.zone
   end
 
+  # The current calendar date in the user's own timezone.
+  def self.local_date(user)
+    Time.current.in_time_zone(user_zone(user)).to_date
+  end
+
   private
 
-  def schedule_next_run(user)
+  def schedule_next_run(user, token)
     return unless user.health_connected?
 
     tomorrow = self.class.next_sync_time(user)
-    self.class.set(wait_until: tomorrow).perform_later(user.id)
+    self.class.set(wait_until: tomorrow).perform_later(user.id, nil, token)
 
     catchup_at = self.class.next_catchup_time(user)
-    self.class.set(wait_until: catchup_at).perform_later(user.id, Date.current.to_s)
+    self.class.set(wait_until: catchup_at).perform_later(user.id, self.class.local_date(user).to_s, token)
   end
 end
