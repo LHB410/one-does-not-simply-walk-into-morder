@@ -2,6 +2,12 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.2.2] - Health sync timezone & duplicate-job fixes
+
+### Fixed
+- **Daily step sync ran against the wrong day for users behind UTC.** `HealthSyncJob` fired at the user's local 23:59 but computed the date with `Date.current` (UTC) — so for users in the Americas, 23:59 local was already the *next* UTC day, syncing a near-empty day and losing that day's steps (one user showed only 91 steps). The sync date and the catch-up date now use the user's own timezone, matching the timezone already used to schedule the run. Users at UTC+ (e.g. Tokyo) were unaffected.
+- **Duplicate Google Health sync chains.** Connecting Google Health started a new self-rescheduling sync chain without retiring the previous one, so reconnecting stacked multiple daily syncs per user (one test account had five, each making its own API call). Each connect now mints a per-user sync token (`users.health_sync_token`, encrypted at rest) that its scheduled jobs carry; a job only syncs/reschedules while its token matches the user's current one, so reconnecting supersedes any prior chain and the stale duplicates stop on their next run. Step data was never double-counted (the once-per-day rule held); the duplicates only wasted Google API calls.
+
 ## [3.2.1] - Public homepage for verification
 
 ### Changed

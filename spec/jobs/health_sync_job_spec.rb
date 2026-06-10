@@ -9,13 +9,26 @@ RSpec.describe HealthSyncJob, type: :job do
   end
 
   describe "#perform" do
-    it "calls HealthSyncService for the user" do
+    it "calls HealthSyncService for the user with their local date" do
       sync_service = instance_double(HealthSyncService, call: true)
       allow(HealthSyncService).to receive(:new).with(user).and_return(sync_service)
 
       described_class.new.perform(user.id)
 
-      expect(sync_service).to have_received(:call).with(date: Date.current)
+      expect(sync_service).to have_received(:call).with(date: Time.current.in_time_zone(user.timezone).to_date)
+    end
+
+    it "syncs the user's LOCAL date, not the server's UTC date" do
+      # 03:30 UTC on Jun 10 is still 23:30 on Jun 9 in America/New_York. The
+      # nightly run must sync Jun 9 (the day ending locally), not Jun 10 (UTC).
+      sync_service = instance_double(HealthSyncService, call: true)
+      allow(HealthSyncService).to receive(:new).with(user).and_return(sync_service)
+
+      travel_to Time.utc(2026, 6, 10, 3, 30) do
+        described_class.new.perform(user.id)
+      end
+
+      expect(sync_service).to have_received(:call).with(date: Date.new(2026, 6, 9))
     end
 
     it "passes the date to HealthSyncService when provided" do
@@ -43,10 +56,21 @@ RSpec.describe HealthSyncJob, type: :job do
 
     it "reschedules nightly sync and catchup after a nightly run" do
       allow(HealthSyncService).to receive_message_chain(:new, :call).and_return(true)
+      local_today = Time.current.in_time_zone(user.timezone).to_date.to_s
 
       expect {
         described_class.new.perform(user.id)
-      }.to have_enqueued_job(described_class).with(user.id).and have_enqueued_job(described_class).with(user.id, Date.current.to_s)
+      }.to have_enqueued_job(described_class).with(user.id, nil, nil).and have_enqueued_job(described_class).with(user.id, local_today, nil)
+    end
+
+    it "schedules the catch-up for the user's LOCAL date, not the UTC date" do
+      allow(HealthSyncService).to receive_message_chain(:new, :call).and_return(true)
+
+      travel_to Time.utc(2026, 6, 10, 3, 30) do
+        expect {
+          described_class.new.perform(user.id)
+        }.to have_enqueued_job(described_class).with(user.id, "2026-06-09", nil)
+      end
     end
 
     it "does not reschedule after a catchup run" do
@@ -71,15 +95,50 @@ RSpec.describe HealthSyncJob, type: :job do
 
       expect {
         described_class.new.perform(user.id)
-      }.to have_enqueued_job(described_class).with(user.id)
+      }.to have_enqueued_job(described_class).with(user.id, nil, nil)
     end
   end
 
   describe ".schedule_for" do
-    it "enqueues a job for the user" do
+    it "mints a fresh sync token on the user and enqueues a job carrying it" do
       expect {
         described_class.schedule_for(user)
-      }.to have_enqueued_job(described_class).with(user.id)
+      }.to change { user.reload.health_sync_token }.from(nil)
+
+      expect(described_class).to have_been_enqueued.with(user.id, nil, user.reload.health_sync_token)
+    end
+
+    it "supersedes a previous schedule: reconnecting changes the token" do
+      described_class.schedule_for(user)
+      first_token = user.reload.health_sync_token
+
+      described_class.schedule_for(user)
+
+      expect(user.reload.health_sync_token).not_to eq(first_token)
+    end
+  end
+
+  describe "superseded (stale) chains" do
+    before { user.update!(health_sync_token: "current-token") }
+
+    it "does not sync when the job's token no longer matches the user's" do
+      expect(HealthSyncService).not_to receive(:new)
+
+      described_class.new.perform(user.id, nil, "stale-token")
+    end
+
+    it "does not reschedule a stale chain (so old duplicate chains die off)" do
+      expect {
+        described_class.new.perform(user.id, nil, "stale-token")
+      }.not_to have_enqueued_job(described_class)
+    end
+
+    it "syncs and reschedules when the token matches" do
+      allow(HealthSyncService).to receive_message_chain(:new, :call).and_return(true)
+
+      expect {
+        described_class.new.perform(user.id, nil, "current-token")
+      }.to have_enqueued_job(described_class).with(user.id, nil, "current-token")
     end
   end
 
