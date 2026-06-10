@@ -73,6 +73,11 @@
         <%= hidden_field_tag :force, '1' %>
       <% end %>
 
+      <%# Browser timezone for local-day dating %>
+      <% if is_current_user %>
+        <%= hidden_field_tag :timezone, nil, data: { controller: "timezone" } %>
+      <% end %>
+
       <%= label_tag :steps, "Add Steps", class: 'block text-sm font-medium text-gray-300 mb-1' %>
       <%= number_field_tag :steps,
           nil,
