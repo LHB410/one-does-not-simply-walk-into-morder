@@ -28,9 +28,6 @@
 !/tmp/storage/
 !/tmp/storage/.keep
 
-# Scripts
-/scripts/backfill.md
-
 /public/assets
 
 # Ignore master key for decrypting credentials and more.
