@@ -1,15 +1,15 @@
-<% content_for(:title) { "Privacy Policy — The Fellowship Tracker" } %>
+<% content_for(:title) { "Privacy Policy — Walk to Mordor" } %>
 
 <div class="min-h-screen bg-stone-900 text-gray-200 py-10 px-4">
   <div class="max-w-3xl mx-auto bg-stone-800 rounded-lg shadow-2xl border-4 border-yellow-600 p-8">
     <h1 class="text-3xl font-bold text-yellow-500 mb-2" style="font-family: 'Cinzel', serif;">Privacy Policy</h1>
-    <p class="text-sm text-gray-400 mb-8">Last updated: June 9, 2026</p>
+    <p class="text-sm text-gray-400 mb-8">Last updated: June 10, 2026</p>
 
     <section class="space-y-4 text-sm leading-relaxed">
       <p>
-        The Fellowship Tracker ("the App", "we", "us") is a collaborative fitness app that turns your
-        daily steps into progress along a shared journey with your group. This policy explains what data
-        we collect, how we use it, and the choices you have.
+        Walk to Mordor ("the App", "we", "us") is a collaborative fitness app that turns your daily steps
+        into progress along a shared journey across Middle-earth with your group. This policy explains what
+        data we collect, how we use it, and the choices you have.
       </p>
 
       <h2 class="text-xl font-semibold text-yellow-500 pt-4">Information we collect</h2>
@@ -18,9 +18,10 @@
         <li>Your daily and cumulative step counts and your progress along the journey.</li>
         <li>Your time zone, used to schedule a daily step sync.</li>
         <li>
-          If you choose to connect Google Health: step-count data retrieved from the Google Health API,
-          along with the access and refresh tokens needed to read it (tokens are <strong>encrypted at
-          rest</strong>).
+          If you choose to connect Google Health: <strong>read-only</strong> access to your
+          <strong>daily step count</strong> from the Google Health API (scope
+          <code>activity_and_fitness.readonly</code>), along with the OAuth access and refresh tokens
+          needed to read it (tokens are <strong>encrypted at rest</strong>).
         </li>
       </ul>
 
@@ -70,6 +71,13 @@
         <li><strong>Google</strong> — OAuth sign-in and the Google Health API (only if you connect it).</li>
         <li><strong>Heroku</strong> — application hosting and database infrastructure.</li>
       </ul>
+
+      <h2 class="text-xl font-semibold text-yellow-500 pt-4">Changes to this policy</h2>
+      <p>
+        If we change how the App accesses, uses, stores, or shares your data — including Google user data —
+        we will update this page and revise the "Last updated" date above. Continued use of the App after a
+        change takes effect constitutes acceptance of the updated policy.
+      </p>
 
       <h2 class="text-xl font-semibold text-yellow-500 pt-4">Contact</h2>
       <p>

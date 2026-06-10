@@ -2,6 +2,12 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.2.3] - Privacy Policy & Terms brand fix
+
+### Changed
+- **Privacy Policy and Terms of Service now use the app's real name, "Walk to Mordor"** (they previously said "The Fellowship Tracker"), so they're clearly associated with the app and the OAuth consent screen — addressing the verification requirement that the privacy policy be associated with your application/brand.
+- **Privacy Policy hardened for verification**: names the exact Google data requested (read-only daily step count, `activity_and_fitness.readonly`) and adds a "Changes to this policy" section noting users are informed when data use changes.
+
 ## [3.2.2] - Health sync timezone & duplicate-job fixes
 
 ### Fixed
