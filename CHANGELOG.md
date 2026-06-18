@@ -2,6 +2,11 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.2.6] - Lothlórien pin badge & shop link
+
+### Added
+- Set the Lothlórien milestone's badge icon (`lothlorien.svg`) and its "Leaf of Lórien" Etsy shop URL via a data migration.
+
 ## [3.2.5] - Capture browser timezone for all members
 
 ### Fixed
