@@ -2,6 +2,23 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.3.0] - Security hardening (CASA prep)
+
+### Added
+- Session idle + absolute timeout (2h / 24h).
+- Content-Security-Policy header (nonce'd scripts).
+- `SecurityHeaders` middleware — security headers on every response.
+- `MimeTypeGuard` middleware — clean 406 on malformed Accept/Content-Type.
+- Log failed login attempts.
+
+### Changed
+- Vendored `@panzoom/panzoom`; dropped the skypack CDN.
+- Popup close buttons use a Stimulus controller (no inline `onclick`).
+- Static routes reject bogus format extensions (`format: false`).
+
+### Security
+- `script-src 'self'` + per-request nonce — no `unsafe-inline`/`unsafe-eval`, no external script hosts.
+
 ## [3.2.6] - Lothlórien pin badge & shop link
 
 ### Added

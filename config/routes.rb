@@ -7,11 +7,11 @@ Rails.application.routes.draw do
   patch "account", to: "accounts#update", as: :account
   delete "account", to: "accounts#destroy"
 
-  get "sign_up", to: "registrations#new", as: :sign_up
+  get "sign_up", to: "registrations#new", as: :sign_up, format: false
   post "sign_up", to: "registrations#create"
 
-  get "privacy", to: "pages#privacy", as: :privacy
-  get "terms", to: "pages#terms", as: :terms
+  get "privacy", to: "pages#privacy", as: :privacy, format: false
+  get "terms", to: "pages#terms", as: :terms, format: false
 
   patch "group/password", to: "groups#update_password", as: :group_password
 

@@ -6,6 +6,11 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Plain Rack middleware, referenced at boot before autoloading — require them
+# explicitly (and keep them out of the lib autoloader below, like clock.rb).
+require_relative "../lib/security_headers"
+require_relative "../lib/mime_type_guard"
+
 module OneDoesNotSimplyWalkIntoMorder
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -15,7 +20,16 @@ module OneDoesNotSimplyWalkIntoMorder
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     # Ignore clock.rb - it's a standalone clockwork config file, not a Rails module
-    config.autoload_lib(ignore: %w[assets tasks clock.rb])
+    config.autoload_lib(ignore: %w[assets tasks clock.rb security_headers.rb mime_type_guard.rb])
+
+    # Security headers on every response (static + error pages too) — outermost
+    # so it wraps static-file and exception responses, not just controllers.
+    config.middleware.insert_before 0, SecurityHeaders
+
+    # Catch malformed Accept/Content-Type headers from scanners and answer a
+    # clean 406. Mounted just inside DebugExceptions so we intercept the
+    # InvalidType exception before it gets logged with a full backtrace.
+    config.middleware.insert_after ActionDispatch::DebugExceptions, MimeTypeGuard
 
     # Active Record Encryption keys are read from the environment (dotenv in
     # dev/test, Heroku config vars in production) rather than Rails credentials.
