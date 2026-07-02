@@ -18,6 +18,7 @@ All notable changes to the Walk to Mordor project.
 
 ### Security
 - `script-src 'self'` + per-request nonce — no `unsafe-inline`/`unsafe-eval`, no external script hosts.
+- Patch dependency CVEs (faraday, nokogiri, concurrent-ruby, crass, msgpack).
 
 ## [3.2.6] - Lothlórien pin badge & shop link
 
