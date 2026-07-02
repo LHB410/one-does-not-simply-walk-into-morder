@@ -2,12 +2,34 @@
 class ApplicationController < ActionController::Base
   include Loggable
 
+  # Log out idle sessions and cap absolute session length (ASVS V3).
+  SESSION_IDLE_TIMEOUT = 2.hours
+  SESSION_ABSOLUTE_TIMEOUT = 24.hours
+
   helper_method :current_user, :logged_in?
 
   # Run each request in the user's timezone so Date.current reflects their day.
   around_action :use_user_time_zone
+  before_action :enforce_session_timeout
 
   private
+
+  # Timestamps are UTC epochs so the per-request timezone can't skew the maths.
+  def enforce_session_timeout
+    return unless logged_in?
+
+    now = Time.current.to_i
+    idle = session[:last_seen_at] && now - session[:last_seen_at] > SESSION_IDLE_TIMEOUT
+    capped = session[:created_at] && now - session[:created_at] > SESSION_ABSOLUTE_TIMEOUT
+
+    if idle || capped
+      reset_session
+      @current_user = nil
+      redirect_to root_path, alert: "Your session expired. Please log in again."
+    else
+      session[:last_seen_at] = now
+    end
+  end
 
   def use_user_time_zone(&block)
     Time.use_zone(request_time_zone, &block)

@@ -51,16 +51,27 @@
       <p class="text-gray-400 text-xs mb-3">Add the members of your fellowship. They'll log in with their email and the shared group password you set below.</p>
 
       <div data-controller="members">
+        <%# A companion is all-or-nothing: leave a row blank to skip it, or fill
+            BOTH name and email. The members controller enforces this in the
+            browser; the server drops fully-blank rows on submit. %>
+        <div class="flex gap-2 mb-1" aria-hidden="true">
+          <span class="<%= label_classes %> flex-1 mb-0">Name<abbr title="required" class="ml-0.5 text-red-400 no-underline">*</abbr></span>
+          <span class="<%= label_classes %> flex-1 mb-0">Email<abbr title="required" class="ml-0.5 text-red-400 no-underline">*</abbr></span>
+          <span class="px-3 invisible select-none">&times;</span>
+        </div>
+
         <div data-members-target="list">
           <% member_rows = (@registration && @registration[:members].presence) || [ {}, {} ] %>
           <% member_rows.each do |row| %>
             <div class="flex gap-2 mb-2 items-start" data-members-row>
               <input type="text" name="registration[members][][name]"
                      value="<%= row[:name] %>" placeholder="Name"
-                     class="<%= input_classes %>">
+                     data-action="input->members#sync"
+                     class="flex-1 <%= input_classes %>">
               <input type="email" name="registration[members][][email]"
                      value="<%= row[:email] %>" placeholder="email@shire.me"
-                     class="<%= input_classes %>">
+                     data-action="input->members#sync"
+                     class="flex-1 <%= input_classes %>">
               <button type="button" data-action="members#remove"
                       class="px-3 py-2 text-red-400 hover:text-red-300 font-bold" aria-label="Remove member">&times;</button>
             </div>
@@ -70,9 +81,11 @@
         <template data-members-target="template">
           <div class="flex gap-2 mb-2 items-start" data-members-row>
             <input type="text" name="registration[members][][name]" placeholder="Name"
-                   class="<%= input_classes %>">
+                   data-action="input->members#sync"
+                   class="flex-1 <%= input_classes %>">
             <input type="email" name="registration[members][][email]" placeholder="email@shire.me"
-                   class="<%= input_classes %>">
+                   data-action="input->members#sync"
+                   class="flex-1 <%= input_classes %>">
             <button type="button" data-action="members#remove"
                     class="px-3 py-2 text-red-400 hover:text-red-300 font-bold" aria-label="Remove member">&times;</button>
           </div>

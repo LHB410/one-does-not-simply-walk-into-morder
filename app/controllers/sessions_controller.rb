@@ -14,12 +14,14 @@ class SessionsController < ApplicationController
       # we mark the session authenticated.
       reset_session
       session[:user_id] = user.id
+      session[:created_at] = session[:last_seen_at] = Time.current.to_i
       respond_to do |format|
         # Force a full page visit so content conditioned on logged_in? re-renders
         format.html { redirect_to root_path, turbo: false }
         format.turbo_stream { redirect_to root_path, status: :see_other }
       end
     else
+      log(:info, "Failed login (#{user ? 'wrong password' : 'no account'}); returning 422")
       respond_to do |format|
         format.html {
           redirect_to root_path, alert: "Invalid email or password"

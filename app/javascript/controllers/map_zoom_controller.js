@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
-import panzoom from "panzoom"
+import Panzoom from "panzoom"
 
+// Pan/zoom for the journey map, backed by the vendored, dependency-free
+// @panzoom/panzoom (no CDN, CSP-clean).
 export default class extends Controller {
   static targets = [ "content" ]
   static values = {
@@ -10,44 +12,40 @@ export default class extends Controller {
   }
 
   connect() {
-    this.pz = panzoom(this.contentTarget, {
-      bounds: true,
-      smoothScroll: false,
-      maxZoom: 5,
-      minZoom: 1,
-      autocenter: false
+    this.pz = Panzoom(this.contentTarget, {
+      maxScale: 5,
+      minScale: 1,
+      contain: "outside",
+      cursor: "grab"
     })
 
+    // @panzoom/panzoom does not bind wheel-zoom by default — wire it on the viewport.
+    this.onWheel = this.pz.zoomWithWheel
+    this.element.addEventListener("wheel", this.onWheel)
+
     if (this.hasInitialScaleValue && this.initialScaleValue > 1) {
-      this.pz.zoomAbs(0, 0, this.initialScaleValue)
-      this.centerOnPoint(this.centerXValue || 50, this.centerYValue || 50)
+      this.centerOnPoint(this.centerXValue || 50, this.centerYValue || 50, this.initialScaleValue)
     }
   }
 
-  centerOnPoint(xPercent, yPercent) {
-    // Use untransformed content dimensions to avoid double-scaling
+  // Zoom to `scale` and pan so the (xPercent, yPercent) point of the content
+  // sits at the centre of the viewport. Pan units are unscaled content pixels;
+  // the element's default transform-origin is its centre.
+  centerOnPoint(xPercent, yPercent, scale) {
     const contentWidth = this.contentTarget.offsetWidth
     const contentHeight = this.contentTarget.offsetHeight
-    const { scale } = this.pz.getTransform()
 
-    const pointXContent = (xPercent / 100) * contentWidth
-    const pointYContent = (yPercent / 100) * contentHeight
+    // Offset of the target point from the content's centre, in unscaled pixels.
+    const offsetX = (xPercent / 100) * contentWidth - contentWidth / 2
+    const offsetY = (yPercent / 100) * contentHeight - contentHeight / 2
 
-    // Target is the center of the viewport hosting the panzoom element
-    const viewport = this.element.getBoundingClientRect()
-    const targetX = viewport.width / 2
-    const targetY = viewport.height / 2
-
-    // Compute absolute translation to place the scaled content point at viewport center
-    const translateX = targetX - (pointXContent * scale)
-    const translateY = targetY - (pointYContent * scale)
-
-    this.pz.moveTo(translateX, translateY)
+    this.pz.zoom(scale, { animate: false })
+    // Pan the opposite way to bring that point to the centre.
+    this.pz.pan(-offsetX, -offsetY, { animate: false })
   }
 
   disconnect() {
-    if (this.pz) this.pz.dispose()
+    if (this.onWheel) this.element.removeEventListener("wheel", this.onWheel)
+    if (this.pz) this.pz.destroy()
   }
 }
-
-

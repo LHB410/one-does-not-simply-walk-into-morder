@@ -13,6 +13,13 @@ RSpec.describe RegistrationsController, type: :controller do
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("Form Your Fellowship")
       end
+
+      it "marks companion fields as required and wires them to fill-both-or-neither" do
+        get :new
+
+        expect(response.body).to include("Name<abbr title=\"required\"")
+        expect(response.body).to include("input->members#sync")
+      end
     end
 
     context "when already logged in" do
@@ -89,6 +96,14 @@ RSpec.describe RegistrationsController, type: :controller do
         params_with_blank[:registration][:members] << { name: "", email: "" }
 
         expect { post :create, params: params_with_blank }.to change(User, :count).by(3)
+      end
+
+      it "lets a leader sign up with no companions (every member row blank)" do
+        leader_only = valid_params.deep_dup
+        leader_only[:registration][:members] = [ { name: "", email: "" }, { name: "", email: "" } ]
+
+        expect { post :create, params: leader_only }.to change(User, :count).by(1)
+        expect(response).to redirect_to(root_path)
       end
     end
 
