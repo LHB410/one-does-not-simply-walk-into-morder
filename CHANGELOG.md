@@ -2,6 +2,12 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.3.1] - Dependency CVE patches
+
+### Security
+- Patch dependency CVEs: activestorage (8.0.5.1, arbitrary file read / RCE in variant processing), json (2.21.2), loofah (2.25.2, `javascript:`/SVG sanitizer bypasses), rails-html-sanitizer (1.7.1, XSS), websocket-driver (0.8.2, DoS / memory exhaustion).
+- Rails stack bumped to 8.0.5.1.
+
 ## [3.3.0] - Security hardening (CASA prep)
 
 ### Added
