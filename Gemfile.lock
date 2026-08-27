@@ -352,7 +352,7 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
-    simple_form (5.4.0)
+    simple_form (5.4.1)
       actionpack (>= 7.0)
       activemodel (>= 7.0)
     solid_cable (3.0.11)
@@ -443,7 +443,7 @@ DEPENDENCIES
   rubocop-rails-omakase
   selenium-webdriver
   shoulda-matchers
-  simple_form (~> 5.0)
+  simple_form (~> 5.4)
   solid_cable
   solid_cache
   solid_queue

@@ -31,7 +31,7 @@ gem "googleauth"
 gem "faraday"
 
 
-gem "simple_form", "~> 5.0"
+gem "simple_form", "~> 5.4"
 gem "tailwindcss-rails"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
