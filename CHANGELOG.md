@@ -2,6 +2,11 @@
 
 All notable changes to the Walk to Mordor project.
 
+## [3.3.2] - Falls of Rauros pin badge & shop link
+
+### Added
+- Set the Falls of Rauros milestone's badge icon (`falls_of_rauros.svg`) and its "Shield of Boromir" Etsy shop URL via a data migration.
+
 ## [3.3.1] - Dependency CVE patches
 
 ### Security
