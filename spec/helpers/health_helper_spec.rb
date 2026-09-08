@@ -4,8 +4,7 @@ RSpec.describe HealthHelper, type: :helper do
   describe "#health_reminder_due?" do
     let(:user) { create(:user) }
 
-    # The renewal cycle is app-wide and anchored to a fixed epoch, so these
-    # travel to a known day on (and off) the cycle rather than to a real date.
+    # Travel to a known day on (and off) the cycle rather than a real date.
     let(:renewal_day) { HealthHelper::REMINDER_EPOCH + (HealthHelper::REMINDER_INTERVAL_DAYS * 4) }
     let(:ordinary_day) { renewal_day + 1 }
 

@@ -1,13 +1,9 @@
 module HealthHelper
-  # Google expires an unverified app's Health grant 7 days after consent. Rather
-  # than track a renewal date per user, the whole app is prompted on one fixed
-  # cycle: 6 < 7, so whenever a member last connected, the next prompt always
-  # lands inside their window. Anchored to the release that introduced it.
+  # Google expires an unverified app's Health grant 7 days after consent; a fixed
+  # 6-day cycle always lands inside that window, whenever a member last connected.
   REMINDER_EPOCH = Date.new(2026, 9, 8)
   REMINDER_INTERVAL_DAYS = 6
 
-  # Cycle days catch everyone before they lapse; the lapsed check is the safety
-  # net for anyone who wasn't in the app on the day.
   def health_reminder_due?(user)
     return false unless user&.health_connected?
 
