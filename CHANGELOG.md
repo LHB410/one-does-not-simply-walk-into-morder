@@ -8,6 +8,9 @@ All notable changes to the Walk to Mordor project.
 - In-app reminder popup prompting renewal of the Google Health connection on a fixed app-wide 6-day cycle. Six days sits inside Google's 7-day refresh-token window whenever a member last connected, so acting on the prompt keeps the nightly sync from ever missing a day.
 - `HealthHelper#health_reminder_due?` drives the popup: every connected user on a cycle day, plus anyone whose grant has already lapsed (the safety net for someone who wasn't in the app that day).
 
+### Security
+- Patch rubyzip path-traversal CVE-2026-85396 (High) by bumping 3.2.2 to 3.6.0. Transitive via `selenium-webdriver`, so test-only, but it fails the bundle-audit CI gate.
+
 ## [3.3.2] - Falls of Rauros pin badge & shop link
 
 ### Added
