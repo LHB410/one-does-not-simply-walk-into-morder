@@ -90,5 +90,34 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to include(terms_path)
       end
     end
+
+    context "when the Google Health connection is due for renewal" do
+      render_views
+      include_context "authenticated user"
+      include_context "active path with milestones"
+
+      let(:renewal_day) { HealthHelper::REMINDER_EPOCH + (HealthHelper::REMINDER_INTERVAL_DAYS * 4) }
+
+      before do
+        allow(Path).to receive(:current).and_return(active_path)
+        user.update!(health_uid: "ABC123", health_access_token: "token")
+      end
+
+      it "shows the reconnect reminder on a renewal day" do
+        travel_to(renewal_day) do
+          get :index
+
+          expect(response.body).to include("health-reminder-popup")
+        end
+      end
+
+      it "stays hidden between renewal days" do
+        travel_to(renewal_day + 1) do
+          get :index
+
+          expect(response.body).not_to include("health-reminder-popup")
+        end
+      end
+    end
   end
 end

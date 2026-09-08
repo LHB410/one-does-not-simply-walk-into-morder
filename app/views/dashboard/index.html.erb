@@ -11,6 +11,8 @@
 
   <turbo-frame id="stats-popup"></turbo-frame>
   <turbo-frame id="milestone_popup"></turbo-frame>
+
+  <%= render "dashboard/health_reconnect_reminder" if health_reminder_due?(@current_user) %>
 <% else %>
   <%= render 'dashboard/entry_choices' %>
 <% end %>
