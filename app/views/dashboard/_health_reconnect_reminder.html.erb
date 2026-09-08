@@ -1,0 +1,41 @@
+<%# Prompts renewal a day before Google expires the Health grant, so the nightly
+    sync never misses a day. Dismiss is per-visit only: it returns until renewed. %>
+<div id="health-reminder-popup"
+     class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="health-reminder-title"
+     data-controller="dismissable">
+  <div class="bg-gray-900 text-white rounded-lg shadow-2xl max-w-md border border-yellow-700 pointer-events-auto mx-4 w-full">
+
+    <%# Header %>
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+      <h2 id="health-reminder-title"
+          class="text-lg font-bold text-yellow-500"
+          style="font-family: 'Cinzel', serif;">
+        Renew your Google Health link
+      </h2>
+      <button type="button"
+              class="text-gray-400 hover:text-white rounded-full p-1"
+              aria-label="Close reminder"
+              data-action="click->dismissable#close">
+        ✕
+      </button>
+    </div>
+
+    <%# Body %>
+    <div class="px-6 py-4">
+      <p class="text-sm text-gray-300">
+        Google asks this app to renew its Google Health permission every 7 days.
+        Reconnect now and your daily steps keep syncing without a gap.
+      </p>
+
+      <%= link_to health_connect_path,
+          id: "health-reminder-connect-link",
+          data: { controller: "health-connect" },
+          class: "block w-full mt-4 py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md text-center transition-colors duration-200" do %>
+        Reconnect Google Health
+      <% end %>
+    </div>
+  </div>
+</div>
