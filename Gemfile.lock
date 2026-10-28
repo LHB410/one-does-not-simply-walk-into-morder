@@ -159,7 +159,7 @@ GEM
     jbuilder (2.15.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (3.1.0)
+    json (2.21.2)
     jwt (3.3.0)
       base64
     kamal (2.12.0)
@@ -432,6 +432,7 @@ DEPENDENCIES
   googleauth
   importmap-rails
   jbuilder
+  json (~> 2.21)
   kamal
   pg (~> 1.1)
   propshaft
