@@ -2,10 +2,11 @@
 
 All notable changes to the Walk to Mordor project.
 
-## [3.3.3] - Dead Marshes pin badge & shop link
+## [3.3.3] - Dead Marshes & Shelob's Lair pin badges
 
 ### Added
 - Set the Dead Marshes milestone's badge icon (`dead_marshes.webp`) and its "Witch-king on a Fell Beast" Etsy shop URL via a data migration.
+- Set the Shelob's Lair milestone's badge icon (`shelobs_lair.webp`) and its "Phial of Galadriel" Etsy shop URL via a data migration.
 
 ## [3.3.2] - Falls of Rauros pin badge & shop link
 
