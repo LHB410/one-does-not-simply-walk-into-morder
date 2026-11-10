@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby "3.4.4"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.2"
+gem "rails", "~> 8.1.4"
 # Rails 8.0's JSON encoder passes quirks_mode:, which json 3.x removed — cap until we're on a Rails that supports it
 gem "json", "~> 2.21"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
